@@ -6,8 +6,8 @@ window.FASTCUP_CONFIG = {
   mapCenter: [58.0105, 56.2294],
 
   // Контакты
-  phone: "+7 (900) 000-00-00",       // как показывать
-  phoneHref: "+79000000000",          // для ссылки tel:
+  phone: "+7 (966) 790-12-46",       // как показывать
+  phoneHref: "+79667901246",          // для ссылки tel:
   telegram: "https://t.me/fastcup_perm",
   max: "https://max.ru/fastcup_perm",
   email: "hello@fastcup.ru",
