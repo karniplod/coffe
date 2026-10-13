@@ -10,7 +10,7 @@
 self.window = self;                  // js/map-data.js пишет в window, а здесь его нет
 importScripts("../js/map-data.js"); // FASTCUP_MAP: уровни и размеры картинок карты
 
-var VERSION = "3";
+var VERSION = "4";
 var CORE = "fastcup-app-" + VERSION;
 var TILES = "fastcup-tiles-" + VERSION;
 var FILES = [
@@ -23,6 +23,7 @@ var FILES = [
 function tileUrls() {
   var M = self.FASTCUP_MAP, out = [];
   M.levels.forEach(function (s, z) {
+    if (z >= 4) return;  // самый близкий уровень — только по мере просмотра (см. fetch ниже), иначе установка огромная
     var cols = Math.ceil(M.width * s / M.tile), rows = Math.ceil(M.height * s / M.tile);
     for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++)
       out.push("../" + M.tiles.replace("{z}", z).replace("{x}", c).replace("{y}", r));

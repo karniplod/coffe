@@ -217,7 +217,7 @@
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback });
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 3 });
     POINTS.forEach(function (p, i) {
       var b = document.createElement("button");
       b.type = "button";

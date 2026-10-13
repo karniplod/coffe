@@ -7,8 +7,8 @@
 (сложный вектор на каждом кадре перерисовывался бы с рывками).
 
 Как собирается:
-  1) из данных OSM рисуется векторная карта (SVG) в четырёх детализациях — tools/osm-cache/vector/
-     (здания — только на самом крупном уровне: общий вид города грузится так же быстро)
+  1) из данных OSM рисуется векторная карта (SVG) в пяти детализациях — tools/osm-cache/vector/
+     (здания — только на двух самых крупных уровнях: общий вид города грузится так же быстро)
   2) Chrome рендерит её в картинки WebP 512×512 — images/web/map/{уровень}/{x}-{y}.webp
   3) js/map-data.js — границы карты и уровни, чтобы сайт ставил метки по координатам
 
@@ -50,6 +50,7 @@ LEVELS = [
     {"scale": 0.5, "detail": "mid"},
     {"scale": 1, "detail": "full"},
     {"scale": 2, "detail": "fine"},
+    {"scale": 4, "detail": "xfine"},  # самый близкий: дома и точка видны чётко
 ]
 
 # основной сервер и зеркала: если один перегружен, пробуем следующий
@@ -437,6 +438,9 @@ DETAIL = {
     # улицы крупно: всё то же и здания
     "fine": {"roads": ("major", "secondary", "tertiary", "minor", "rail"), "width": 1, "rivers": 1, "streams": True,
              "places": 13, "streets": True, "kama": 20, "buildings": True},
+    # самый близкий масштаб: линии тоньше и подписи мельче, иначе вблизи они раздуваются вдвое
+    "xfine": {"roads": ("major", "secondary", "tertiary", "minor", "rail"), "width": .6, "rivers": .6, "streams": True,
+              "places": 7, "streets": True, "kama": 11, "buildings": True, "label": .55},
 }
 
 
@@ -494,10 +498,12 @@ def write_vector(detail, out_dir, green_geom, water_geom, river_geom, stream_geo
             labels.append((seg.buffer(fk), '<path id="%s" d="%s"/>' % (pid, ring_d(seg.coords, False)),
                            '<text><textPath href="#%s" startOffset="50%%">р. Кама</textPath></text>' % pid, "kama"))
 
+    lk = opt.get("label", 1)  # размер подписей улиц относительно обычного
     halo = 'paint-order="stroke" stroke="%s" stroke-linejoin="round"' % C["land"]
     font = 'font-family="Inter, Segoe UI, Arial, sans-serif"'
     groups = {
-        "street": '<g %s font-size="12.5" font-weight="500" fill="%s" %s stroke-width="3" text-anchor="middle">' % (font, C["street_label"], halo),
+        "street": '<g %s font-size="%s" font-weight="500" fill="%s" %s stroke-width="%s" text-anchor="middle">'
+                  % (font, fmt(12.5 * lk), C["street_label"], halo, fmt(3 * lk)),
         "kama": '<g %s font-size="%s" font-style="italic" fill="%s" text-anchor="middle" letter-spacing="%s">' % (font, fk, C["water_label"], fmt(fk / 20)),
         "place": '<g %s font-size="%s" font-weight="600" fill="%s" %s stroke-width="%s" text-anchor="middle" letter-spacing="%s">'
                  % (font, opt["places"] or 13, C["place_label"], halo, fmt((opt["places"] or 13) * 0.27), fmt((opt["places"] or 13) * 0.12)),

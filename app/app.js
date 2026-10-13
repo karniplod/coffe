@@ -49,7 +49,7 @@
   /* ---------- карта ---------- */
   function wide() { return window.innerWidth >= 700; }
   var omap = FastcupMap($("map"), {
-    data: MAP, base: "../", oneFinger: true, wheel: true, maxScale: 4,
+    data: MAP, base: "../", oneFinger: true, wheel: true, maxScale: 8,
     // свободная от шапки и карточки часть экрана — туда помещаем маршрут
     margin: function () { return wide() ? [90, 70, 40, 420] : [90, 20, sheet.offsetHeight + 30, 20]; },
     onUserMove: function () { setFollow(false); },
