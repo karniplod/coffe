@@ -7,7 +7,8 @@
 (сложный вектор на каждом кадре перерисовывался бы с рывками).
 
 Как собирается:
-  1) из данных OSM рисуется векторная карта (SVG) в трёх детализациях — tools/osm-cache/vector/
+  1) из данных OSM рисуется векторная карта (SVG) в четырёх детализациях — tools/osm-cache/vector/
+     (здания — только на самом крупном уровне: общий вид города грузится так же быстро)
   2) Chrome рендерит её в картинки WebP 512×512 — images/web/map/{уровень}/{x}-{y}.webp
   3) js/map-data.js — границы карты и уровни, чтобы сайт ставил метки по координатам
 
@@ -48,7 +49,7 @@ LEVELS = [
     {"scale": 0.25, "detail": "low"},
     {"scale": 0.5, "detail": "mid"},
     {"scale": 1, "detail": "full"},
-    {"scale": 2, "detail": "full"},
+    {"scale": 2, "detail": "fine"},
 ]
 
 # основной сервер и зеркала: если один перегружен, пробуем следующий
@@ -85,17 +86,18 @@ C = {
     "water": "#BCCDC6", "water_line": "#BCCDC6", "rail": "#C2AE9A", "boundary": "#B9876F",
     "minor": "#FBF3E7", "tertiary": "#FFF8EE", "secondary": "#FDEBCB", "major": "#F8D59F",
     "casing": "#E2C7A6", "major_casing": "#DDB284",
+    "building": "#E4D0B5",
     "street_label": "#8C7260", "place_label": "#A68B76", "water_label": "#6F928B",
 }
 
 
-def fetch(name, refresh):
+def fetch(name, refresh, query=None, bbox=BBOX):
     path = os.path.join(CACHE, name + ".json")
     if os.path.exists(path) and not refresh:
         return json.load(open(path, encoding="utf-8"))
     os.makedirs(CACHE, exist_ok=True)
-    b = "{},{},{},{}".format(*BBOX)
-    q = "[out:json][timeout:300];(" + QUERIES[name].format(b=b) + ");out " + ("center tags" if name == "places" else "geom") + ";"
+    b = "{},{},{},{}".format(*bbox)
+    q = "[out:json][timeout:300];(" + (query or QUERIES[name]).format(b=b) + ");out " + ("center tags" if name == "places" else "geom") + ";"
     data = urllib.parse.urlencode({"data": q}).encode()
     for attempt in range(8):
         server = OVERPASS[attempt % len(OVERPASS)]
@@ -110,6 +112,28 @@ def fetch(name, refresh):
             print("  %s (%s): %s — пробую другой сервер" % (server.split("/")[2], name, e))
             time.sleep(10)
     sys.exit("Не удалось скачать данные " + name)
+
+
+BUILDINGS_QUERY = """
+        way["building"]({b}); relation["building"]["type"="multipolygon"]({b});"""
+BUILDING_CHUNKS = (3, 4)  # область карты делим на 3×4 куска: по всему городу ответ Overpass слишком большой
+
+
+def fetch_buildings(refresh):
+    """Здания OSM по кускам области; здания на стыке кусков приходят дважды — берём один раз."""
+    rows, cols = BUILDING_CHUNKS
+    s0, w0, n0, e0 = BBOX
+    seen, out = set(), []
+    for r in range(rows):
+        for c in range(cols):
+            bb = (s0 + (n0 - s0) * r / rows, w0 + (e0 - w0) * c / cols,
+                  s0 + (n0 - s0) * (r + 1) / rows, w0 + (e0 - w0) * (c + 1) / cols)
+            for el in fetch("buildings-%d-%d" % (r, c), refresh, BUILDINGS_QUERY, bb)["elements"]:
+                key = (el["type"], el["id"])
+                if key not in seen:
+                    seen.add(key)
+                    out.append(el)
+    return out
 
 
 # ---------- проекция (Web Mercator, как у онлайн-карт) ----------
@@ -248,6 +272,7 @@ def main():
     refresh = "--refresh" in sys.argv
     print("Данные OSM…")
     data = {k: fetch(k, refresh)["elements"] for k in QUERIES}
+    data["buildings"] = fetch_buildings(refresh)
 
     # --- вода ---
     water_polys, water_lines, kama = [], {"river": [], "small": []}, []
@@ -297,6 +322,18 @@ def main():
         cls[k].append(g)
         if k in ("major", "secondary", "tertiary") and t.get("name") and not hw.endswith("_link"):
             named.setdefault(t["name"], {"rank": k, "lines": []})["lines"].append(g)
+
+    # --- здания: каждое отдельно, мелкие (гаражи, сараи) не рисуем ---
+    buildings = []
+    for el in data["buildings"]:
+        a = area_of(el)
+        if a is None or a.is_empty:
+            continue
+        for poly in polys_of(a.simplify(0.3, preserve_topology=True)):
+            if poly.area >= 1.0:  # 1 единица² ≈ 72 м²
+                buildings.append(poly)
+    print("  зданий: %d" % len(buildings))
+    building_geom = unary_union(buildings).difference(water_all).intersection(FRAME) if buildings else None
 
     # --- граница города ---
     border = None
@@ -365,7 +402,7 @@ def main():
     vec_root = os.path.join(CACHE, "vector")
     for detail in sorted({lv["detail"] for lv in LEVELS}):
         write_vector(detail, os.path.join(vec_root, detail), green_geom, water_geom, river_geom, stream_geom,
-                     road_geom, border, places, streets, kama_lines)
+                     road_geom, border, places, streets, kama_lines, building_geom)
 
     # --- готовые картинки для сайта ---
     print("Рендерю картинки WebP через Chrome…")
@@ -397,10 +434,14 @@ DETAIL = {
     # улицы: всё, как в векторной карте
     "full": {"roads": ("major", "secondary", "tertiary", "minor", "rail"), "width": 1, "rivers": 1, "streams": True,
              "places": 13, "streets": True, "kama": 20},
+    # улицы крупно: всё то же и здания
+    "fine": {"roads": ("major", "secondary", "tertiary", "minor", "rail"), "width": 1, "rivers": 1, "streams": True,
+             "places": 13, "streets": True, "kama": 20, "buildings": True},
 }
 
 
-def write_vector(detail, out_dir, green_geom, water_geom, river_geom, stream_geom, road_geom, border, places, streets, kama_lines):
+def write_vector(detail, out_dir, green_geom, water_geom, river_geom, stream_geom, road_geom, border, places, streets, kama_lines,
+                 building_geom=None):
     opt = DETAIL[detail]
     k = opt["width"]
     g_line = 'fill="none" stroke-linecap="round" stroke-linejoin="round"'
@@ -411,6 +452,8 @@ def write_vector(detail, out_dir, green_geom, water_geom, river_geom, stream_geo
     if opt["streams"]:
         layers.append(('%s stroke="%s" stroke-width="2.2"' % (g_line, C["water_line"]), stream_geom, False, True))
     layers.append(('fill="%s"' % C["water"], water_geom, True, True))
+    if opt.get("buildings"):  # под дорогами: дороги и подписи поверх зданий
+        layers.append(('fill="%s"' % C["building"], building_geom, True, True))
     road_style = [
         ("rail", C["rail"], 2.2, None), ("minor", C["minor"], 1.6, None),
         ("tertiary", C["tertiary"], 2.8, C["casing"]), ("secondary", C["secondary"], 3.8, C["casing"]),
