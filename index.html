@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <!-- SEO: замените https://example.ru на ваш домен (здесь, в sitemap.xml и robots.txt) -->
-  <title>Кофе с собой в Перми за 100 ₽ — кофейные автоматы Fastcup</title>
-  <meta name="description" content="Fastcup — сеть кофейных автоматов самообслуживания в Перми. Капучино, латте, американо и раф за 100 ₽, готово за 1 минуту. Аренда кофейных аппаратов и ингредиенты оптом.">
+  <title>Кофе с собой в Перми от 100 ₽ — кофейные автоматы Fastcup</title>
+  <meta name="description" content="Fastcup — сеть кофейных автоматов самообслуживания в Перми. Капучино, латте, раф, гляссе и ещё 10 напитков от 100 ₽, готово за 1 минуту. Каждый 7-й напиток бесплатно. Установим кофейный автомат у вас, обслуживание и ремонт.">
   <link rel="canonical" href="https://example.ru/">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#1E120E">
@@ -19,11 +19,11 @@
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="Fastcup">
   <meta property="og:title" content="Fastcup — кофе с собой за 1 минуту в Перми">
-  <meta property="og:description" content="Любой напиток за 100 ₽. Найдите ближайший кофейный автомат Fastcup на карте Перми.">
+  <meta property="og:description" content="Напитки от 100 ₽, каждый 7-й бесплатно. Найдите ближайший кофейный автомат Fastcup на карте Перми.">
   <meta property="og:url" content="https://example.ru/">
   <meta property="og:image" content="https://example.ru/images/web/banner-cup.jpg">
   <link rel="icon" href="images/web/favicon.png">
-  <link rel="apple-touch-icon" href="images/web/logo-dark.png">
+  <link rel="apple-touch-icon" href="images/web/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
@@ -39,8 +39,8 @@
         "@id": "https://example.ru/#org",
         "name": "Fastcup",
         "url": "https://example.ru/",
-        "logo": "https://example.ru/images/web/logo-dark.png",
-        "description": "Сеть кофейных автоматов самообслуживания в Перми. Собственное производство аппаратов, аренда для бизнеса, продажа ингредиентов.",
+        "logo": "https://example.ru/images/web/logo-full-dark.png",
+        "description": "Сеть кофейных автоматов самообслуживания в Перми. Собственное производство аппаратов, установка автоматов у партнёров, обслуживание и ремонт, продажа ингредиентов.",
         "areaServed": { "@type": "City", "name": "Пермь" },
         "telephone": "+79000000000",
         "sameAs": ["https://t.me/fastcup_perm"]
@@ -53,24 +53,30 @@
         "image": "https://example.ru/images/web/vending-interior.jpg",
         "url": "https://example.ru/",
         "telephone": "+79000000000",
-        "priceRange": "100 ₽",
+        "priceRange": "от 100 ₽",
         "servesCuisine": "Кофе",
-        "paymentAccepted": "Банковская карта, СБП, QR-код",
+        "paymentAccepted": "Банковская карта, оплата телефоном",
         "address": { "@type": "PostalAddress", "addressLocality": "Пермь", "addressRegion": "Пермский край", "addressCountry": "RU" },
         "hasMenu": {
           "@type": "Menu",
           "hasMenuSection": {
             "@type": "MenuSection",
-            "name": "Напитки 350 мл",
+            "name": "Напитки 200 мл",
             "hasMenuItem": [
-              { "@type": "MenuItem", "name": "Капучино", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Латте", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Американо", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Раф", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Мокачино", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Какао", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Горячий шоколад", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
-              { "@type": "MenuItem", "name": "Чай", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } }
+              { "@type": "MenuItem", "name": "Капучино", "description": "Эспрессо, горячее молоко и плотная пенка", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Латте", "description": "Больше молока, мягкий сливочный вкус", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Американо", "description": "Эспрессо и горячая вода, без молока", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Горячий шоколад", "description": "Густой, сладкий, согревает", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Мокачино", "description": "Кофе, шоколад и молочная пенка", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Ореховый капучино", "description": "Капучино с ореховым вкусом", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Ванильный капучино", "description": "Капучино с нежным вкусом ванили", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Двойной эспрессо", "description": "Две порции эспрессо: крепко и бодро", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Раф ванильный", "description": "Эспрессо со сливками и ванилью", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Раф ореховый", "description": "Эспрессо со сливками и ореховым вкусом", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Какао", "description": "Как в детстве, только за минуту", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Гляссе", "description": "Холодный десертный напиток", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Коктейль ванильный", "description": "Молочный коктейль с ванилью, горячий или холодный", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } },
+              { "@type": "MenuItem", "name": "Коктейль ореховый", "description": "Молочный коктейль с орехом, горячий или холодный", "offers": { "@type": "Offer", "price": "100", "priceCurrency": "RUB" } }
             ]
           }
         }
@@ -78,10 +84,11 @@
       {
         "@type": "FAQPage",
         "mainEntity": [
-          { "@type": "Question", "name": "Сколько стоит кофе в автомате Fastcup?", "acceptedAnswer": { "@type": "Answer", "text": "Любой напиток объёмом 350 мл стоит 100 ₽: капучино, латте, американо, раф, мокачино, какао, горячий шоколад или чай." } },
-          { "@type": "Question", "name": "Как оплатить кофе?", "acceptedAnswer": { "@type": "Answer", "text": "Банковской картой, телефоном или по QR-коду. Наличные не нужны." } },
+          { "@type": "Question", "name": "Сколько стоит кофе в автомате Fastcup?", "acceptedAnswer": { "@type": "Answer", "text": "Напитки 200 мл стоят от 100 ₽. В меню: капучино, латте, американо, горячий шоколад, мокачино, ореховый капучино, ванильный капучино, двойной эспрессо, раф ванильный, раф ореховый, какао, гляссе, коктейль ванильный, коктейль ореховый." } },
+          { "@type": "Question", "name": "Как оплатить кофе?", "acceptedAnswer": { "@type": "Answer", "text": "Банковской картой или телефоном. Наличные не нужны." } },
+          { "@type": "Question", "name": "Есть ли бонусы?", "acceptedAnswer": { "@type": "Answer", "text": "Да: каждый 7-й напиток бесплатно." } },
           { "@type": "Question", "name": "Где находятся автоматы Fastcup в Перми?", "acceptedAnswer": { "@type": "Answer", "text": "Все точки отмечены на карте на главной странице сайта. Разрешите доступ к геопозиции, и сайт покажет ближайший автомат и маршрут до него." } },
-          { "@type": "Question", "name": "Можно ли арендовать кофейный автомат для бизнеса?", "acceptedAnswer": { "@type": "Answer", "text": "Да. Мы производим автоматы сами, устанавливаем их в офисах, торговых центрах, вузах и на вокзалах, обслуживаем и ремонтируем." } },
+          { "@type": "Question", "name": "Можно ли поставить кофейный автомат у себя?", "acceptedAnswer": { "@type": "Answer", "text": "Да. Мы производим автоматы сами, ставим их в офисах, торговых центрах, вузах и на вокзалах, обслуживаем и ремонтируем." } },
           { "@type": "Question", "name": "Продаёте ли вы ингредиенты для кофемашин?", "acceptedAnswer": { "@type": "Answer", "text": "Да, оптом: зерновой кофе, сухое молоко, какао, шоколад, сиропы, стаканы и крышки. Те же, на которых работают наши точки." } }
         ]
       }
@@ -94,24 +101,31 @@
 <a class="skip" href="#main">К содержимому</a>
 
 <header class="topbar">
+  <!-- логотип по центру, пункты меню поровну слева и справа -->
+  <div class="topbar__side topbar__side--left">
+    <button class="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
+    <nav class="nav" aria-label="Разделы">
+      <span class="nav__pill" aria-hidden="true"></span>
+      <a href="#top" data-spy="top">Главная</a>
+      <a href="#about" data-spy="about">О нас</a>
+      <a href="#how" data-spy="how">Как это работает</a>
+    </nav>
+  </div>
   <a class="brand" href="#top" aria-label="Fastcup — на главную">
     <span class="brand__logo" aria-hidden="true">
-      <img class="brand__logo-light" src="images/web/logo-light.png" alt="" width="44" height="44">
-      <img class="brand__logo-dark" src="images/web/logo-dark.png" alt="" width="44" height="44">
+      <img class="brand__logo-light" src="images/web/logo-word-light.png" alt="" width="480" height="223">
+      <img class="brand__logo-dark" src="images/web/logo-word-dark.png" alt="" width="480" height="223">
     </span>
-    <span>Fastcup</span>
   </a>
-  <nav class="nav" aria-label="Разделы">
-    <span class="nav__pill" aria-hidden="true"></span>
-    <a href="#top" data-spy="top">Главная</a>
-    <a href="#about" data-spy="about">О нас</a>
-    <a href="#how" data-spy="how">Как это работает</a>
-    <a href="#menu" data-spy="menu">Меню</a>
-    <a href="#b2b" data-spy="b2b">Бизнесу</a>
-    <a href="#contacts" data-spy="contacts">Контакты</a>
-  </nav>
-  <a class="topbar__phone js-phone" href="tel:+79000000000">+7 (900) 000-00-00</a>
-  <button class="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
+  <div class="topbar__side topbar__side--right">
+    <nav class="nav" aria-label="Разделы, продолжение">
+      <span class="nav__pill" aria-hidden="true"></span>
+      <a href="#menu" data-spy="menu">Меню</a>
+      <a href="#b2b" data-spy="b2b">Бизнесу</a>
+      <a href="#contacts" data-spy="contacts">Контакты</a>
+    </nav>
+    <a class="topbar__phone js-phone" href="tel:+79000000000">+7 (900) 000-00-00</a>
+  </div>
 </header>
 <nav class="mnav" id="mnav" aria-label="Разделы" hidden>
   <a href="#top">Главная</a>
@@ -141,7 +155,7 @@
 
     <div class="hero__panel" data-tone="panel">
       <h1 class="hero__title">Fastcup — кофе с собой за&nbsp;1&nbsp;минуту</h1>
-      <p class="hero__lead">Сеть кофейных автоматов в Перми. Любой напиток за 100 ₽: свежий помол, горячий стакан и никакой очереди.</p>
+      <p class="hero__lead">Сеть кофейных автоматов в Перми. Напитки от 100 ₽: свежий помол, горячий стакан и никакой очереди.</p>
 
       <div class="nearest" id="nearest" aria-live="polite">
         <span class="nearest__dot" aria-hidden="true"></span>
@@ -156,14 +170,17 @@
       </div>
 
       <div class="hero__actions">
-        <a class="btn btn--sunset" href="#b2b" data-topic="Ингредиенты">Приобрести компоненты для кофемашины</a>
-        <a class="btn btn--ghost" href="#b2b" data-topic="Аренда">Арендовать аппарат</a>
+        <a class="btn btn--sunset" href="#b2b" data-topic="Обслуживание">Обслуживание и ремонт</a>
+        <a class="btn btn--ghost" href="#b2b" data-topic="Установка">Разместить аппарат у себя</a>
       </div>
     </div>
 
     <figure class="hero__cup" aria-hidden="true">
-      <img src="images/web/cup.webp" alt="" width="736" height="1308" fetchpriority="high">
-      <figcaption>100 ₽ · 350 мл</figcaption>
+      <picture>
+        <source srcset="images/web/cup-logo.webp" type="image/webp">
+        <img src="images/web/cup-logo.jpg" alt="Стакан кофе Fastcup с логотипом" width="736" height="1308" fetchpriority="high">
+      </picture>
+      <figcaption>от 100 ₽ · 200 мл</figcaption>
     </figure>
 
     <a class="hero__scroll" href="#beans">Листайте вниз</a>
@@ -199,8 +216,8 @@
         <path d="M38 62 L162 62 L146 248 L54 248 Z" fill="url(#cupBody)"/>
         <path d="M44 98 L156 98 L149 196 L51 196 Z" fill="url(#cupSleeve)"/>
         <g clip-path="url(#sleeveClip)">
-          <text class="cup3d__word" x="100" y="158" text-anchor="middle">Fastcup</text>
-          <image class="cup3d__logo" href="images/web/logo-dark.png" x="62" y="104" width="76" height="76"/>
+          <image class="cup3d__logo" href="images/web/logo-cup-word.png" x="52" y="126" width="96" height="43"/>
+          <image class="cup3d__sub" href="images/web/logo-cup-sub.png" x="52" y="126" width="96" height="43"/>
         </g>
         <path d="M30 50 h140 a6 6 0 0 1 6 6 v6 h-152 v-6 a6 6 0 0 1 6-6z" fill="url(#cupLid)"/>
         <path d="M44 36 h112 l8 14 h-128 z" fill="url(#cupLid)"/>
@@ -215,13 +232,13 @@
       <div class="about__text">
         <h2>Мы делаем автоматы сами</h2>
         <p>Fastcup появился в Перми из простой идеи: хороший кофе не должен стоить дорого и отнимать время. Мы сами собираем кофейные аппараты, сами подбираем рецепты и сами следим за каждой точкой.</p>
-        <p>Поэтому стакан стоит 100 ₽, а готов за минуту, без бариста и без очереди.</p>
+        <p>Поэтому стакан стоит от 100 ₽, а готов за минуту, без бариста и без очереди.</p>
       </div>
       <figure class="about__machine">
         <img src="images/web/vending.webp" alt="Кофейный автомат Fastcup собственного производства, Пермь" width="900" height="1720" loading="lazy">
         <p class="note note--a">своё производство в&nbsp;Перми</p>
-        <p class="note note--b">оплата картой и&nbsp;по&nbsp;QR</p>
-        <p class="note note--c">любой напиток 350&nbsp;мл</p>
+        <p class="note note--b">каждый 7-й напиток бесплатно</p>
+        <p class="note note--c">напитки по&nbsp;200&nbsp;мл</p>
         <svg class="arrow arrow--a" viewBox="0 0 120 60" aria-hidden="true"><path d="M4 10 C40 2 80 14 112 48" /><path d="M98 44 L112 48 L110 33" /></svg>
         <svg class="arrow arrow--b" viewBox="0 0 120 60" aria-hidden="true"><path d="M116 12 C80 4 36 18 8 46" /><path d="M22 44 L8 46 L12 32" /></svg>
         <svg class="arrow arrow--c" viewBox="0 0 120 60" aria-hidden="true"><path d="M4 50 C38 54 76 40 110 12" /><path d="M96 12 L110 12 L106 26" /></svg>
@@ -259,7 +276,7 @@
           <span class="step__num" aria-hidden="true">2</span>
         </div>
         <h3>Оплатите картой или телефоном</h3>
-        <p>Приложите карту или смартфон, либо отсканируйте QR-код. Наличные не нужны.</p>
+        <p>Приложите банковскую карту или смартфон к терминалу. Наличные не нужны.</p>
       </li>
       <li class="step">
         <div class="step__mark">
@@ -283,54 +300,85 @@
     <div class="menu__inner">
       <div class="menu__head">
         <h2>Меню</h2>
-        <p class="section-lead">Каждый напиток в стакане 350 мл. Сироп добавим по желанию.</p>
-        <div class="price-tag" aria-label="Любой напиток 100 рублей">
-          <span class="price-tag__small">любой напиток</span>
-          <span class="price-tag__big">100 ₽</span>
+        <p class="section-lead">14 напитков в стакане 200 мл. А каждый 7-й напиток — бесплатно.</p>
+        <div class="price-tag" aria-label="Напитки от 100 рублей за 200 миллилитров">
+          <span class="price-tag__small">200 мл</span>
+          <span class="price-tag__big">от 100 ₽</span>
         </div>
       </div>
       <ul class="drinks">
         <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc0"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc0)"><rect x="0" y="70.2" width="80" height="26.4" fill="#3B1F14"/><rect x="0" y="45.1" width="80" height="25.7" fill="#F1DFC8"/><rect x="0" y="20.0" width="80" height="25.7" fill="#FFF9F0"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc0"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc0)"><rect x="0" y="18.8" width="80" height="26.3" fill="#FFF9F0"/><rect x="0" y="44.5" width="80" height="26.3" fill="#F1DFC8"/><rect x="0" y="70.2" width="80" height="26.4" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
           <h3 class="drink__name">Капучино</h3>
           <p class="drink__desc">Эспрессо, горячее молоко и плотная пенка</p>
         </li>
         <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc1"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc1)"><rect x="0" y="80.8" width="80" height="15.8" fill="#3B1F14"/><rect x="0" y="35.2" width="80" height="46.2" fill="#F1DFC8"/><rect x="0" y="20.0" width="80" height="15.8" fill="#FFF9F0"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc1"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc1)"><rect x="0" y="18.8" width="80" height="16.4" fill="#FFF9F0"/><rect x="0" y="34.6" width="80" height="46.8" fill="#F1DFC8"/><rect x="0" y="80.8" width="80" height="15.8" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
           <h3 class="drink__name">Латте</h3>
           <p class="drink__desc">Больше молока, мягкий сливочный вкус</p>
         </li>
         <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc2"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc2)"><rect x="0" y="69.4" width="80" height="27.2" fill="#3B1F14"/><rect x="0" y="20.0" width="80" height="50.0" fill="#7A4428"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc2"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc2)"><rect x="0" y="19.4" width="80" height="50.6" fill="#7A4428"/><rect x="0" y="69.4" width="80" height="27.2" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
           <h3 class="drink__name">Американо</h3>
           <p class="drink__desc">Эспрессо и горячая вода, без молока</p>
         </li>
         <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc3"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc3)"><rect x="0" y="77.0" width="80" height="19.6" fill="#3B1F14"/><rect x="0" y="31.4" width="80" height="46.2" fill="#EBCFA4"/><rect x="0" y="20.0" width="80" height="12.0" fill="#FFF9F0"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
-          <h3 class="drink__name">Раф</h3>
-          <p class="drink__desc">Эспрессо со сливками и ванилью</p>
-        </li>
-        <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc4"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc4)"><rect x="0" y="77.0" width="80" height="19.6" fill="#5A2B1C"/><rect x="0" y="58.0" width="80" height="19.6" fill="#3B1F14"/><rect x="0" y="35.2" width="80" height="23.4" fill="#F1DFC8"/><rect x="0" y="20.0" width="80" height="15.8" fill="#FFF9F0"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
-          <h3 class="drink__name">Мокачино</h3>
-          <p class="drink__desc">Кофе, шоколад и молочная пенка</p>
-        </li>
-        <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc5"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc5)"><rect x="0" y="33.7" width="80" height="62.9" fill="#A0654A"/><rect x="0" y="20.0" width="80" height="14.3" fill="#FFF9F0"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
-          <h3 class="drink__name">Какао</h3>
-          <p class="drink__desc">Как в детстве, только за минуту</p>
-        </li>
-        <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc6"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc6)"><rect x="0" y="20.0" width="80" height="76.6" fill="#5A2B1C"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc3"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc3)"><rect x="0" y="20.0" width="80" height="76.6" fill="#5A2B1C"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
           <h3 class="drink__name">Горячий шоколад</h3>
           <p class="drink__desc">Густой, сладкий, согревает</p>
         </li>
         <li class="drink">
-          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc7"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc7)"><rect x="0" y="20.0" width="80" height="76.6" fill="#C9772E"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
-          <h3 class="drink__name">Чай</h3>
-          <p class="drink__desc">Чёрный, горячий, бодрит не хуже кофе</p>
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc4"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc4)"><rect x="0" y="18.2" width="80" height="16.4" fill="#FFF9F0"/><rect x="0" y="34.0" width="80" height="24.0" fill="#F1DFC8"/><rect x="0" y="57.4" width="80" height="20.2" fill="#3B1F14"/><rect x="0" y="77.0" width="80" height="19.6" fill="#5A2B1C"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Мокачино</h3>
+          <p class="drink__desc">Кофе, шоколад и молочная пенка</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc5"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc5)"><rect x="0" y="18.8" width="80" height="26.3" fill="#FFF9F0"/><rect x="0" y="44.5" width="80" height="26.3" fill="#D9B48A"/><rect x="0" y="70.2" width="80" height="26.4" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Ореховый капучино</h3>
+          <p class="drink__desc">Капучино с ореховым вкусом</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc6"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc6)"><rect x="0" y="18.8" width="80" height="26.3" fill="#FFF9F0"/><rect x="0" y="44.5" width="80" height="26.3" fill="#F3E2B0"/><rect x="0" y="70.2" width="80" height="26.4" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Ванильный капучино</h3>
+          <p class="drink__desc">Капучино с нежным вкусом ванили</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc7"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc7)"><rect x="0" y="60.6" width="80" height="6.6" fill="#B9773F"/><rect x="0" y="66.6" width="80" height="30.0" fill="#2A140C"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Двойной эспрессо</h3>
+          <p class="drink__desc">Две порции эспрессо: крепко и бодро</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc8"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc8)"><rect x="0" y="18.8" width="80" height="12.6" fill="#FFF9F0"/><rect x="0" y="30.8" width="80" height="46.8" fill="#F3E2B0"/><rect x="0" y="77.0" width="80" height="19.6" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Раф ванильный</h3>
+          <p class="drink__desc">Эспрессо со сливками и ванилью</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc9"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc9)"><rect x="0" y="18.8" width="80" height="12.6" fill="#FFF9F0"/><rect x="0" y="30.8" width="80" height="46.8" fill="#E2BF94"/><rect x="0" y="77.0" width="80" height="19.6" fill="#3B1F14"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Раф ореховый</h3>
+          <p class="drink__desc">Эспрессо со сливками и ореховым вкусом</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc10"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc10)"><rect x="0" y="19.4" width="80" height="14.9" fill="#FFF9F0"/><rect x="0" y="33.7" width="80" height="62.9" fill="#A0654A"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Какао</h3>
+          <p class="drink__desc">Как в детстве, только за минуту</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc11"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc11)"><rect x="0" y="19.6" width="80" height="15.6" fill="#FFF9F0"/><rect x="0" y="34.6" width="80" height="22.6" fill="#C99A6E"/><rect x="0" y="56.6" width="80" height="40.0" fill="#4A2618"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Гляссе</h3>
+          <p class="drink__desc">Холодный десертный напиток</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc12"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc12)"><rect x="0" y="20.0" width="80" height="76.6" fill="#F6E7BC"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Коктейль ванильный</h3>
+          <p class="drink__desc">Молочный коктейль с ванилью, горячий или холодный</p>
+        </li>
+        <li class="drink">
+          <svg class="drink__cup" viewBox="0 0 80 100" aria-hidden="true"><defs><clipPath id="cc13"><path d="M11 20h58l-6.5 76h-45z"/></clipPath></defs><g clip-path="url(#cc13)"><rect x="0" y="20.0" width="80" height="76.6" fill="#E3C29C"/><path d="M11 20h58l-1 9h-56z" fill="#fff" opacity=".12"/></g><path class="drink__glass" d="M11 20h58l-6.5 76h-45z"/><path class="drink__steam" d="M32 14c-3-4 3-6 0-11M42 14c-3-4 3-6 0-11M52 14c-3-4 3-6 0-11"/></svg>
+          <h3 class="drink__name">Коктейль ореховый</h3>
+          <p class="drink__desc">Молочный коктейль с орехом, горячий или холодный</p>
         </li>
       </ul>
+      <p class="bonus"><span class="bonus__num">7-й</span> напиток бесплатно</p>
     </div>
   </section>
 
@@ -338,15 +386,15 @@
   <section class="b2b" id="b2b" data-tone="light">
     <div class="b2b__head">
       <h2>Бизнесу</h2>
-      <p class="section-lead">Поставим кофейный автомат к вам или привезём ингредиенты для вашего.</p>
+      <p class="section-lead">Поставим кофейный автомат у вас, обслужим и отремонтируем, привезём ингредиенты.</p>
     </div>
     <div class="bento">
       <article class="tile tile--rent">
-        <img class="tile__bg" src="images/web/vending-interior.jpg" alt="Аренда кофейного автомата Fastcup для офиса или торгового центра" width="1600" height="1100" loading="lazy">
+        <img class="tile__bg" src="images/web/vending-interior.jpg" alt="Кофейный автомат Fastcup в офисе или торговом центре" width="1600" height="1100" loading="lazy">
         <div class="tile__body">
-          <h3>Аренда аппарата</h3>
+          <h3>Поставим аппарат у вас</h3>
           <p>Кофейный автомат нашего производства под ваш поток людей. Устанавливаем, настраиваем и обслуживаем сами. Подходит для офисов, ТЦ, вузов, АЗС и вокзалов.</p>
-          <a class="btn btn--sunset" href="#contacts" data-topic="Аренда">Обсудить аренду</a>
+          <a class="btn btn--sunset" href="#contacts" data-topic="Установка">Обсудить установку</a>
         </div>
       </article>
       <article class="tile tile--goods">
@@ -366,12 +414,13 @@
       </article>
       <article class="tile tile--service">
         <div class="tile__body">
-          <h3>Сервис под ключ</h3>
+          <h3>Обслуживание и ремонт</h3>
           <ul class="service">
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 20V9l6-5 6 5v11"/></svg>Загрузка ингредиентов</li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21h10M12 3c3 4 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 7 12 3z"/></svg>Чистка и санобработка</li>
             <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/></svg>Ремонт и запчасти</li>
           </ul>
+          <a class="btn btn--sunset" href="#contacts" data-topic="Обслуживание">Заказать ремонт</a>
         </div>
       </article>
     </div>
@@ -384,11 +433,15 @@
       <div class="faq__list">
         <details>
           <summary>Сколько стоит кофе в автомате Fastcup?</summary>
-          <p>Любой напиток 350 мл стоит 100 ₽: капучино, латте, американо, раф, мокачино, какао, горячий шоколад или чай.</p>
+          <p>Напитки 200 мл стоят от 100 ₽. В меню: капучино, латте, американо, горячий шоколад, мокачино, ореховый капучино, ванильный капучино, двойной эспрессо, раф ванильный, раф ореховый, какао, гляссе, коктейль ванильный, коктейль ореховый.</p>
         </details>
         <details>
           <summary>Как оплатить?</summary>
-          <p>Банковской картой, телефоном или по QR-коду. Наличные не нужны.</p>
+          <p>Банковской картой или телефоном. Наличные не нужны.</p>
+        </details>
+        <details>
+          <summary>Есть ли бонусы?</summary>
+          <p>Да: каждый 7-й напиток бесплатно.</p>
         </details>
         <details>
           <summary>Где найти кофейный автомат в Перми?</summary>
@@ -436,7 +489,8 @@
         </div>
         <fieldset class="field topics">
           <legend>Что вас интересует</legend>
-          <label><input type="radio" name="topic" value="Аренда" checked> Аренда аппарата</label>
+          <label><input type="radio" name="topic" value="Установка" checked> Поставить аппарат у себя</label>
+          <label><input type="radio" name="topic" value="Обслуживание"> Обслуживание и ремонт</label>
           <label><input type="radio" name="topic" value="Ингредиенты"> Ингредиенты</label>
           <label><input type="radio" name="topic" value="Другое"> Другое</label>
         </fieldset>
@@ -454,8 +508,8 @@
 </main>
 
 <footer class="footer" data-tone="dark">
-  <img src="images/web/logo-light.png" alt="Fastcup" width="72" height="72" loading="lazy">
-  <p>Fastcup — сеть кофейных автоматов самообслуживания в Перми. Кофе с собой за 100 ₽, аренда кофейных аппаратов и ингредиенты оптом.</p>
+  <img src="images/web/logo-full-light.png" alt="Fastcup — кофе с собой" width="200" height="90" loading="lazy">
+  <p>Fastcup — сеть кофейных автоматов самообслуживания в Перми. Кофе с собой от 100 ₽, установка кофейных автоматов, обслуживание и ремонт, ингредиенты оптом.</p>
   <p class="footer__copy">© <span id="year">2026</span> Fastcup</p>
 </footer>
 

@@ -35,23 +35,29 @@
     });
   });
 
-  /* ---------- подсветка меню: «пилюля» едет за курсором ---------- */
-  var nav = document.querySelector(".nav");
-  var pill = nav && nav.querySelector(".nav__pill");
-  var navLinks = nav ? Array.prototype.slice.call(nav.querySelectorAll("a")) : [];
+  /* ---------- подсветка меню: «пилюля» едет за курсором ----------
+     Меню разделено логотипом на две половины (.nav слева и справа), у каждой своя «пилюля». */
+  var navs = Array.prototype.slice.call(document.querySelectorAll(".nav"));
+  var navLinks = [];
+  navs.forEach(function (nav) { navLinks = navLinks.concat(Array.prototype.slice.call(nav.querySelectorAll("a"))); });
   var activeLink = null;
+  // показать «пилюлю» под пунктом a (в его половине меню), в другой половине — убрать; null — убрать везде
   function movePill(a) {
-    if (!a) { nav.classList.remove("has-pill"); return; }
-    pill.style.width = a.offsetWidth + "px";
-    pill.style.transform = "translateX(" + a.offsetLeft + "px)";
-    nav.classList.add("has-pill");
+    navs.forEach(function (nav) {
+      if (!a || !nav.contains(a)) { nav.classList.remove("has-pill"); return; }
+      var pill = nav.querySelector(".nav__pill");
+      pill.style.width = a.offsetWidth + "px";
+      pill.style.transform = "translateX(" + a.offsetLeft + "px)";
+      nav.classList.add("has-pill");
+    });
   }
   navLinks.forEach(function (a) {
     a.addEventListener("mouseenter", function () { movePill(a); });
     a.addEventListener("focus", function () { movePill(a); });
   });
   function restPill() { movePill(activeLink && activeLink.dataset.spy !== "top" ? activeLink : null); }
-  if (nav) nav.addEventListener("mouseleave", restPill);
+  function navHovered() { return navs.some(function (nav) { return nav.matches(":hover"); }); }
+  navs.forEach(function (nav) { nav.addEventListener("mouseleave", restPill); });
 
   /* какой раздел сейчас на экране */
   var spyTargets = navLinks.map(function (a) {
@@ -100,7 +106,7 @@
       if (activeLink) activeLink.classList.remove("is-active");
       activeLink = cur;
       if (activeLink) activeLink.classList.add("is-active");
-      if (nav && !nav.matches(":hover")) movePill(activeLink && activeLink.dataset.spy !== "top" ? activeLink : null);
+      if (!navHovered()) movePill(activeLink && activeLink.dataset.spy !== "top" ? activeLink : null);
     }
     if (totop) {
       totop.classList.toggle("is-visible", y > vh * 0.8);
