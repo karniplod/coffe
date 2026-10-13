@@ -196,7 +196,11 @@ p { margin: 0; }
 }
 /* карта первого экрана — js/omap.js, стили карты — css/omap.css */
 .hero__map { position: absolute; inset: 0; }
-.hero__map .omap__zoom { top: 110px; right: 24px; }   /* ниже шапки сайта */
+/* кнопки масштаба — сразу справа от панели, по центру высоты: рядом с текстом и метками, а не в дальнем углу */
+.hero__map .omap__zoom { right: auto; left: calc(var(--gutter) + min(560px, 100%) + 28px); top: 50%; transform: translateY(-50%); }
+.hero__map .omap__zoom button { width: 44px; height: 44px; }
+.omap__all { display: grid; place-items: center; margin-top: 4px; }
+.omap__all svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .map-fallback {
   position: absolute; inset: 0; display: grid; place-items: center;
   background:
@@ -252,12 +256,23 @@ p { margin: 0; }
 .hero__cup img { border-radius: 10px; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 70%; }
 .hero__cup figcaption { font: 700 clamp(22px, 2vw, 30px)/1 var(--hand); white-space: nowrap; color: var(--ink); text-align: center; padding: 10px 0 12px; }
 
+/* «Листайте вниз» — тёмная капсула: читается и на светлой карте */
 .hero__scroll {
-  position: absolute; z-index: 2; left: 50%; bottom: 18px; transform: translateX(-50%);
-  font-size: 13px; color: rgba(255,246,236,.7); text-decoration: none;
-  padding: 8px 12px;
+  position: absolute; z-index: 2; left: 50%; bottom: 22px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; color: var(--foam); text-decoration: none; white-space: nowrap;
+  padding: 10px 18px; border-radius: 999px;
+  background: rgba(30,18,14,.82); box-shadow: 0 10px 24px -10px rgba(30,18,14,.6);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: background-color .2s;
 }
-.hero__scroll::after { content: ""; display: block; width: 1px; height: 26px; margin: 6px auto 0; background: currentColor; }
+.hero__scroll:hover { background: var(--espresso); }
+.hero__scroll::after {
+  content: ""; width: 8px; height: 8px; margin-top: -4px;
+  border-right: 2px solid var(--apricot); border-bottom: 2px solid var(--apricot); transform: rotate(45deg);
+  animation: scroll-hint 1.6s ease-in-out infinite;
+}
+@keyframes scroll-hint { 0%, 100% { translate: 0 0; } 50% { translate: 0 4px; } }
 
 
  /* ---------- зёрна + стаканчик ---------- */
@@ -521,7 +536,7 @@ p { margin: 0; }
   .hero__panel { width: auto; margin: -48px 12px 0; padding: 28px 22px 30px; background: var(--espresso); border-radius: 26px; z-index: 3; }
   .hero__scroll { display: none; }
   .hero__map .omap__attr { bottom: 56px; }
-  .hero__map .omap__zoom { right: 14px; top: 84px; }
+  .hero__map .omap__zoom { left: auto; right: 14px; top: auto; bottom: 84px; transform: none; }  /* внизу справа — под большим пальцем */
 }
 @media (max-width: 720px) {
   body { font-size: 16px; }

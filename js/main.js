@@ -211,13 +211,25 @@
 
   function panelMargin() {
     var panel = document.querySelector(".hero__panel");
-    if (window.innerWidth <= 960) return [90, 40, 70, 40];  // панель под картой (см. @media 960px в style.css)
+    if (window.innerWidth <= 960) return [90, 70, 70, 40];  // панель под картой (см. @media 960px в style.css)
     var cupRight = window.innerWidth > 1080 ? 300 : 40;     // справа место под карточку стаканчика, если она видна
-    return [110, cupRight, 90, panel.getBoundingClientRect().right + 40];
+    return [110, cupRight, 90, panel.getBoundingClientRect().right + 100];  // +100: место под кнопками масштаба у панели
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 3 });
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2 });
+    // кнопка «Все точки» под «+» и «−»: вернуть карту к виду со всеми автоматами
+    var zoomBox = mapEl.querySelector(".omap__zoom");
+    if (zoomBox && count > 1) {
+      var allBtn = document.createElement("button");
+      allBtn.type = "button";
+      allBtn.className = "omap__all";
+      allBtn.title = "Показать все точки";
+      allBtn.setAttribute("aria-label", "Показать все точки на карте");
+      allBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+      allBtn.addEventListener("click", function () { omap.fit(POINTS.map(function (p) { return p.coords; }), false, true); });
+      zoomBox.appendChild(allBtn);
+    }
     POINTS.forEach(function (p, i) {
       var b = document.createElement("button");
       b.type = "button";
@@ -252,7 +264,9 @@
       dot.title = "Вы здесь";
       dot.innerHTML = '<div class="fc-me"></div>';
       omap.addMarker(dot, me);
-      selectPoint(order[0], true);
+      selectPoint(order[0], false);
+      // первый вид: вы и три ближайших автомата — видно и ближайший, и соседние
+      omap.fit([me].concat(order.slice(0, 3).map(function (k) { return POINTS[k].coords; })), false, true);
     }, function () {
       noGeo("Разрешите геопозицию, и мы найдём ближайший автомат");
     }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });

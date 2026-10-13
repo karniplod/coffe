@@ -336,6 +336,13 @@
       }, { passive: false });
     }
 
+    /* Двойной щелчок по карте — приблизить к этому месту */
+    el.addEventListener("dblclick", function (e) {
+      if (e.target.closest(".omap__zoom, .omap__attr, .omap__pin, .is-draggable, button, a")) return;
+      var r = el.getBoundingClientRect();
+      zoomAt(scale * 2, e.clientX - r.left, e.clientY - r.top, true);
+    });
+
     /* Кнопки «+» и «−»: масштаб вокруг середины свободной части карты */
     zoom.querySelectorAll("button").forEach(function (btn) {
       btn.addEventListener("click", function () {
