@@ -196,9 +196,8 @@ p { margin: 0; }
 }
 /* карта первого экрана — js/omap.js, стили карты — css/omap.css */
 .hero__map { position: absolute; inset: 0; }
-/* кнопки масштаба — сразу справа от панели, по центру высоты: рядом с текстом и метками, а не в дальнем углу */
-.hero__map .omap__zoom { right: auto; left: calc(var(--gutter) + min(560px, 100%) + 28px); top: 50%; transform: translateY(-50%); }
-.hero__map .omap__zoom button { width: 44px; height: 44px; }
+/* кнопки масштаба — у правого края, под шапкой: не закрывают панель и метки */
+.hero__map .omap__zoom { right: 24px; top: 110px; }
 .omap__all { display: grid; place-items: center; margin-top: 4px; }
 .omap__all svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .map-fallback {
@@ -549,7 +548,9 @@ p { margin: 0; }
   .hero__panel { width: auto; margin: -48px 12px 0; padding: 28px 22px 30px; background: var(--espresso); border-radius: 26px; z-index: 3; }
   .hero__scroll { display: none; }
   .hero__map .omap__attr { bottom: 56px; }
-  .hero__map .omap__zoom { left: auto; right: 14px; top: auto; bottom: 84px; transform: none; }  /* внизу справа — под большим пальцем */
+  .hero__map .omap__zoom { right: 12px; top: 84px; gap: 5px; }
+  .hero__map .omap__zoom button { width: 36px; height: 36px; font-size: 21px; border-radius: 10px; }
+  .omap__all svg { width: 17px; height: 17px; }
 }
 @media (max-width: 720px) {
   body { font-size: 16px; }

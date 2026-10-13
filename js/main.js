@@ -55,7 +55,7 @@
     a.addEventListener("mouseenter", function () { movePill(a); });
     a.addEventListener("focus", function () { movePill(a); });
   });
-  function restPill() { movePill(activeLink && activeLink.dataset.spy !== "top" ? activeLink : null); }
+  function restPill() { movePill(activeLink); }
   function navHovered() { return navs.some(function (nav) { return nav.matches(":hover"); }); }
   navs.forEach(function (nav) { nav.addEventListener("mouseleave", restPill); });
 
@@ -106,7 +106,7 @@
       if (activeLink) activeLink.classList.remove("is-active");
       activeLink = cur;
       if (activeLink) activeLink.classList.add("is-active");
-      if (!navHovered()) movePill(activeLink && activeLink.dataset.spy !== "top" ? activeLink : null);
+      if (!navHovered()) movePill(activeLink);
     }
     if (totop) {
       totop.classList.toggle("is-visible", y > vh * 0.8);
@@ -211,13 +211,13 @@
 
   function panelMargin() {
     var panel = document.querySelector(".hero__panel");
-    if (window.innerWidth <= 960) return [90, 70, 70, 40];  // панель под картой (см. @media 960px в style.css)
-    var cupRight = window.innerWidth > 1080 ? 300 : 40;     // справа место под карточку стаканчика, если она видна
-    return [110, cupRight, 90, panel.getBoundingClientRect().right + 100];  // +100: место под кнопками масштаба у панели
+    if (window.innerWidth <= 960) return [100, 90, 70, 45];  // панель под картой (см. @media 960px в style.css)
+    var cupRight = window.innerWidth > 1080 ? 300 : 90;     // справа место под карточку стаканчика (если видна) и кнопки масштаба
+    return [110, cupRight, 90, panel.getBoundingClientRect().right + 40];
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2 });
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .3 });
     // кнопка «Все точки» под «+» и «−»: вернуть карту к виду со всеми автоматами
     var zoomBox = mapEl.querySelector(".omap__zoom");
     if (zoomBox && count > 1) {
