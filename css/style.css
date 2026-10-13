@@ -396,7 +396,15 @@ p { margin: 0; }
 .drink__name { margin-top: 18px; font: 700 32px/1 var(--hand); color: var(--foam); }
 .drink__desc { margin-top: 8px; font-size: 14px; line-height: 1.45; color: rgba(255,246,236,.7); max-width: 22ch; }
 /* бонус: каждый 7-й напиток бесплатно */
-.bonus-box { margin-top: 48px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+/* бонус: картинка акции слева, плашка и пояснение справа (на телефоне — друг под другом) */
+.bonus-box {
+  margin-top: 56px; display: grid; grid-template-columns: auto auto; grid-template-rows: auto auto;
+  justify-content: center; align-content: center; column-gap: 32px; row-gap: 14px; text-align: left;
+}
+.bonus__pic { grid-row: 1 / span 2; }
+.bonus__pic img { width: 240px; border-radius: 22px; transform: rotate(-3deg); box-shadow: 0 0 0 6px rgba(255,246,236,.18), 0 30px 50px -20px rgba(30,18,14,.75); }
+.bonus-box .bonus { align-self: end; }
+.bonus-box .bonus__note { align-self: start; }
 .bonus__note { font-size: 16px; color: rgba(255,255,255,.92); max-width: 46ch; }
 .bonus {
   display: flex; align-items: center; justify-content: center; gap: 14px; width: fit-content; margin: 0;
@@ -566,6 +574,9 @@ p { margin: 0; }
   .price-tag__small { font-size: 12px; }
   .drinks { --cols: 2; gap: 12px; margin-top: 40px; }
   .drink { flex-basis: calc((100% - 12px) / 2); }
+  .bonus-box { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .bonus__pic { grid-row: auto; }
+  .bonus__pic img { width: min(260px, 80vw); }
   .bonus { font-size: 28px; padding: 10px 22px 10px 12px; }
   .bonus__num { width: 52px; height: 52px; font-size: 25px; }
   .drink { padding: 22px 10px 20px; }
