@@ -313,6 +313,8 @@ p { margin: 0; }
 /* ---------- о бренде ---------- */
 .about { background: var(--foam-glow); padding: var(--section) var(--gutter); }
 .about__inner { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(40px, 6vw, 110px); align-items: center; }
+/* заголовок длинный — мельче обычного h2, чтобы уместился в 3–4 строки */
+.about__text h2 { font-size: clamp(42px, 4.4vw, 66px); line-height: 1.05; }
 .about__text p { margin-top: 24px; font-size: 19px; max-width: 42ch; }
 .about__machine { position: relative; margin: 0; padding: 0 170px; }
 .about__machine img { width: 100%; max-width: 320px; margin: 0 auto; filter: drop-shadow(0 40px 40px rgba(58,34,25,.28)); }
