@@ -282,7 +282,7 @@ p { margin: 0; }
   color: var(--foam); overflow: hidden;
 }
 .beans__text { max-width: 30rem; justify-self: end; }
-.beans__text h2 { color: var(--apricot); }
+.beans__text h2 { color: var(--apricot); font-size: clamp(42px, 4.4vw, 66px); line-height: 1.05; }  /* длинный заголовок — мельче обычного h2 */
 .beans__text p { margin-top: 22px; font-size: 19px; color: rgba(255,246,236,.78); }
 .beans__hint { font: 700 26px/1 var(--hand) !important; color: var(--crema) !important; margin-top: 36px !important; }
 .beans__stage { position: relative; aspect-ratio: 1 / 1; width: min(100%, 640px); justify-self: start; touch-action: pan-y; cursor: pointer; }

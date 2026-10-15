@@ -9,7 +9,7 @@ window.FASTCUP_CONFIG = {
   phone: "+7 (966) 790-12-46",       // как показывать
   phoneHref: "+79667901246",          // для ссылки tel:
   telegram: "https://t.me/fastcup_perm",
-  max: "https://max.ru/fastcup_perm",
+  max: "https://max.ru/u/f9LHodD0cOLNgyFpx2TMMpZm8dQrDDkFBR8pqF8eruHmCrOysKUcZy9P4CU",
   email: "takeawayperm@yandex.ru",
 
   // Куда отправлять заявки из формы (POST JSON).
