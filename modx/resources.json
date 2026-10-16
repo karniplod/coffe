@@ -1,0 +1,359 @@
+[
+ {
+  "alias": "index",
+  "parent": "",
+  "home": true,
+  "template": "fc-home",
+  "richtext": 0,
+  "fields": {
+   "pagetitle": "Главная",
+   "longtitle": "Кофе с собой в Перми от 100 ₽ — кофейные автоматы Fastcup",
+   "description": "Fastcup — сеть кофейных автоматов самообслуживания в Перми. Капучино, латте, раф, гляссе и ещё 10 напитков от 100 ₽, готово за 1 минуту. Каждый 7-й напиток бесплатно. Установим кофейный автомат у вас, обслуживание и ремонт.",
+   "introtext": "Напитки от 100 ₽, каждый 7-й бесплатно. Найдите ближайший кофейный автомат Fastcup на карте Перми.",
+   "menutitle": "Главная",
+   "content": ""
+  },
+  "tvs": {
+   "fc_faq": "Сколько стоит кофе в автомате Fastcup? | Любой напиток: 200 мл — 100 ₽, 300 мл — 150 ₽. В меню: капучино, латте, американо, горячий шоколад, мокачино, ореховый капучино, ванильный капучино, двойной эспрессо, раф ванильный, раф ореховый, какао, гляссе, коктейль ванильный, коктейль ореховый.\nКак оплатить? | Банковской картой, телефоном или наличными. Бонусы начисляются при оплате картой.\nЕсть ли бонусы? | Да, при оплате банковской картой. Автомат запоминает вашу карту, и с каждой покупки начисляются бонусы — процент от суммы. Так каждый 7-й напиток получается бесплатным.\nГде найти кофейный автомат в Перми? | Все точки отмечены на карте вверху страницы. Разрешите доступ к геопозиции, и сайт покажет ближайший автомат и проложит пеший маршрут в Яндекс Картах.\nМожно поставить автомат у нас в офисе или магазине? | Да. Мы производим аппараты сами, подберём модель под ваш поток людей, установим и возьмём обслуживание на себя. Оставьте заявку, и мы приедем посмотреть место.\nПродаёте ингредиенты для своей кофемашины? | Да, оптом: зерновой кофе, сухое молоко, какао, шоколад, сиропы, стаканы и крышки. Пришлём прайс по запросу."
+  }
+ },
+ {
+  "alias": "menu",
+  "parent": "",
+  "template": "fc-section",
+  "isfolder": 1,
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Меню (напитки)",
+   "description": "Напитки на главной. Добавить напиток: правый клик по разделу → «Создать документ». Порядок — перетаскиванием"
+  },
+  "tvs": {}
+ },
+ {
+  "alias": "kapuchino",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Капучино"
+  },
+  "tvs": {
+   "fc_drink_desc": "Эспрессо, горячее молоко и плотная пенка",
+   "fc_drink_layers": "26.4 #3B1F14\n25.7 #F1DFC8\n25.7 #FFF9F0"
+  }
+ },
+ {
+  "alias": "latte",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Латте"
+  },
+  "tvs": {
+   "fc_drink_desc": "Больше молока, мягкий сливочный вкус",
+   "fc_drink_layers": "15.8 #3B1F14\n46.2 #F1DFC8\n15.8 #FFF9F0"
+  }
+ },
+ {
+  "alias": "amerikano",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Американо"
+  },
+  "tvs": {
+   "fc_drink_desc": "Эспрессо и горячая вода, без молока",
+   "fc_drink_layers": "27.2 #3B1F14\n50 #7A4428"
+  }
+ },
+ {
+  "alias": "goryachiy-shokolad",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Горячий шоколад"
+  },
+  "tvs": {
+   "fc_drink_desc": "Густой, сладкий, согревает",
+   "fc_drink_layers": "76.6 #5A2B1C"
+  }
+ },
+ {
+  "alias": "mokachino",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Мокачино"
+  },
+  "tvs": {
+   "fc_drink_desc": "Кофе, шоколад и молочная пенка",
+   "fc_drink_layers": "19.6 #5A2B1C\n19.6 #3B1F14\n23.4 #F1DFC8\n15.8 #FFF9F0"
+  }
+ },
+ {
+  "alias": "orehovyy-kapuchino",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Ореховый капучино"
+  },
+  "tvs": {
+   "fc_drink_desc": "Капучино с ореховым вкусом",
+   "fc_drink_layers": "26.4 #3B1F14\n25.7 #D9B48A\n25.7 #FFF9F0"
+  }
+ },
+ {
+  "alias": "vanilnyy-kapuchino",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Ванильный капучино"
+  },
+  "tvs": {
+   "fc_drink_desc": "Капучино с нежным вкусом ванили",
+   "fc_drink_layers": "26.4 #3B1F14\n25.7 #F3E2B0\n25.7 #FFF9F0"
+  }
+ },
+ {
+  "alias": "dvoynoy-espresso",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Двойной эспрессо"
+  },
+  "tvs": {
+   "fc_drink_desc": "Две порции эспрессо: крепко и бодро",
+   "fc_drink_layers": "30 #2A140C\n6 #B9773F"
+  }
+ },
+ {
+  "alias": "raf-vanilnyy",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Раф ванильный"
+  },
+  "tvs": {
+   "fc_drink_desc": "Эспрессо со сливками и ванилью",
+   "fc_drink_layers": "19.6 #3B1F14\n46.2 #F3E2B0\n12 #FFF9F0"
+  }
+ },
+ {
+  "alias": "raf-orehovyy",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Раф ореховый"
+  },
+  "tvs": {
+   "fc_drink_desc": "Эспрессо со сливками и ореховым вкусом",
+   "fc_drink_layers": "19.6 #3B1F14\n46.2 #E2BF94\n12 #FFF9F0"
+  }
+ },
+ {
+  "alias": "kakao",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Какао"
+  },
+  "tvs": {
+   "fc_drink_desc": "Как в детстве, только за минуту",
+   "fc_drink_layers": "62.9 #A0654A\n14.3 #FFF9F0"
+  }
+ },
+ {
+  "alias": "glyasse",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Гляссе"
+  },
+  "tvs": {
+   "fc_drink_desc": "Холодный десертный напиток",
+   "fc_drink_layers": "40 #4A2618\n22 #C99A6E\n15 #FFF9F0"
+  }
+ },
+ {
+  "alias": "kokteyl-vanilnyy",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Коктейль ванильный"
+  },
+  "tvs": {
+   "fc_drink_desc": "Молочный коктейль с ванилью, горячий или холодный",
+   "fc_drink_layers": "76.6 #F6E7BC"
+  }
+ },
+ {
+  "alias": "kokteyl-orehovyy",
+  "parent": "menu",
+  "template": "fc-drink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Коктейль ореховый"
+  },
+  "tvs": {
+   "fc_drink_desc": "Молочный коктейль с орехом, горячий или холодный",
+   "fc_drink_layers": "76.6 #E3C29C"
+  }
+ },
+ {
+  "alias": "tochki",
+  "parent": "",
+  "template": "fc-section",
+  "isfolder": 1,
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Точки (автоматы на карте)",
+   "description": "Точки на карте сайта и в приложении. Сейчас — ПРИМЕРЫ адресов: замените на свои"
+  },
+  "tvs": {}
+ },
+ {
+  "alias": "fastcup-tsentr",
+  "parent": "tochki",
+  "template": "fc-point",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Fastcup · Центр"
+  },
+  "tvs": {
+   "fc_point_address": "Пример: ул. Ленина (замените адрес)",
+   "fc_point_hours": "Круглосуточно",
+   "fc_point_coords": "58.0119, 56.2452"
+  }
+ },
+ {
+  "alias": "fastcup-kompros",
+  "parent": "tochki",
+  "template": "fc-point",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Fastcup · Компрос"
+  },
+  "tvs": {
+   "fc_point_address": "Пример: Комсомольский проспект (замените адрес)",
+   "fc_point_hours": "07:00–23:00",
+   "fc_point_coords": "58.0002, 56.2368"
+  }
+ },
+ {
+  "alias": "fastcup-naberezhnaya",
+  "parent": "tochki",
+  "template": "fc-point",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Fastcup · Набережная"
+  },
+  "tvs": {
+   "fc_point_address": "Пример: у набережной Камы (замените адрес)",
+   "fc_point_hours": "08:00–22:00",
+   "fc_point_coords": "58.0178, 56.2275"
+  }
+ },
+ {
+  "alias": "fastcup-motoviliha",
+  "parent": "tochki",
+  "template": "fc-point",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Fastcup · Мотовилиха"
+  },
+  "tvs": {
+   "fc_point_address": "Пример: Мотовилихинский район (замените адрес)",
+   "fc_point_hours": "Круглосуточно",
+   "fc_point_coords": "58.0279, 56.2965"
+  }
+ },
+ {
+  "alias": "fastcup-perm-ii",
+  "parent": "tochki",
+  "template": "fc-point",
+  "hidemenu": 1,
+  "searchable": 0,
+  "fields": {
+   "pagetitle": "Fastcup · Пермь II"
+  },
+  "tvs": {
+   "fc_point_address": "Пример: район вокзала Пермь II (замените адрес)",
+   "fc_point_hours": "05:00–00:00",
+   "fc_point_coords": "57.9915, 56.1902"
+  }
+ },
+ {
+  "alias": "politika",
+  "parent": "",
+  "template": "fc-page",
+  "hidemenu": 1,
+  "richtext": 1,
+  "fields": {
+   "pagetitle": "Политика конфиденциальности",
+   "longtitle": "Политика обработки персональных данных",
+   "description": "Как Fastcup обрабатывает персональные данные из формы заявки на сайте",
+   "content": "<p class=\"doc__note\">Заполните реквизиты в квадратных скобках: «Ресурсы → Политика конфиденциальности» в админке MODX.</p>\n\n<h2>1. Кто обрабатывает данные</h2>\n<p>Оператор персональных данных — [название ИП или ООО], ИНН [ИНН], ОГРН/ОГРНИП [номер], адрес: [юридический адрес] (далее — «Fastcup», «мы»). Почта для вопросов о данных: [[++fc_email]], телефон: [[++fc_phone]].</p>\n<p>Политика составлена по Федеральному закону от 27.07.2006 № 152-ФЗ «О персональных данных» и действует для всех данных, которые мы получаем через сайт [[++site_url]].</p>\n\n<h2>2. Какие данные мы получаем</h2>\n<ul>\n  <li>Из формы заявки: имя, номер телефона, выбранная тема и комментарий, если вы его написали.</li>\n  <li>Автоматически: адрес страницы, с которой отправлена заявка.</li>\n  <li>Геопозицию сайт запрашивает только в вашем браузере, чтобы показать ближайший автомат; на наш сервер она не передаётся.</li>\n</ul>\n\n<h2>3. Зачем</h2>\n<p>Чтобы ответить на заявку: связаться с вами, обсудить установку кофейной стойки, обслуживание и ремонт, поставку ингредиентов. Рекламных рассылок по этим данным мы не делаем.</p>\n\n<h2>4. Основание</h2>\n<p>Ваше согласие, которое вы даёте, отправляя форму (п. 1 ч. 1 ст. 6 152-ФЗ). Согласие можно отозвать в любой момент — напишите на [[++fc_email]].</p>\n\n<h2>5. Как мы обращаемся с данными</h2>\n<ul>\n  <li>Храним заявки не дольше, чем нужно для ответа и сотрудничества, но не более [срок, например, 3 лет], затем удаляем.</li>\n  <li>Не передаём третьим лицам, кроме случаев, предусмотренных законом.</li>\n  <li>Данные хранятся на серверах в России: [хостинг, например, ООО «Бегет»].</li>\n  <li>Доступ к заявкам есть только у сотрудников, которые на них отвечают.</li>\n</ul>\n\n<h2>6. Ваши права</h2>\n<p>Вы можете узнать, какие ваши данные у нас есть, попросить уточнить или удалить их, отозвать согласие. Напишите на [[++fc_email]] — ответим в течение 10 рабочих дней.</p>\n\n<h2>7. Изменения</h2>\n<p>Мы можем обновлять эту политику; актуальная версия всегда на этой странице. Дата последнего изменения: [дата].</p>"
+  },
+  "tvs": {}
+ },
+ {
+  "alias": "robots",
+  "parent": "",
+  "template": "",
+  "hidemenu": 1,
+  "searchable": 0,
+  "always": true,
+  "content_type": "text/plain",
+  "fields": {
+   "pagetitle": "robots.txt",
+   "content": "User-agent: *\nAllow: /\nDisallow: /manager/\nDisallow: /fastcup-modx/\n\nSitemap: [[++site_url]]sitemap.xml"
+  },
+  "tvs": {}
+ },
+ {
+  "alias": "sitemap",
+  "parent": "",
+  "template": "",
+  "hidemenu": 1,
+  "searchable": 0,
+  "always": true,
+  "content_type": "text/xml",
+  "fields": {
+   "pagetitle": "sitemap.xml",
+   "content": "[[pdoSitemap? &parents=`0,-[[++fc_menu_id]],-[[++fc_points_id]]` &resources=`-[[++fc_menu_id]],-[[++fc_points_id]]` &where=`{ \"searchable\": 1 }` &showHidden=`1`]]"
+  },
+  "tvs": {}
+ }
+]

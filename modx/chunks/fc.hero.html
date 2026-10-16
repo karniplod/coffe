@@ -1,0 +1,41 @@
+  <!-- 1. HERO: карта на весь экран -->
+  <section class="hero" data-tone="light" aria-label="Кофейные автоматы Fastcup на карте Перми">
+    <div class="hero__map" id="map" role="region" aria-label="Карта автоматов Fastcup">
+      <div class="map-fallback" id="mapFallback">
+        <p>Здесь будет карта с нашими точками</p>
+      </div>
+      <!-- карту, метки и кнопки создаёт js/omap.js -->
+    </div>
+
+    <div class="hero__panel" data-tone="panel">
+      <h1 class="hero__title">Fastcup — кофе с собой за&nbsp;1&nbsp;минуту</h1>
+      <p class="hero__lead">Сеть кофейных автоматов в Перми. Напитки от 100 ₽: свежий помол, горячий стакан и никакой очереди.</p>
+
+      <div class="nearest" id="nearest" aria-live="polite">
+        <span class="nearest__dot" aria-hidden="true"></span>
+        <div class="nearest__body">
+          <p class="nearest__label" id="nearestLabel">Ищем ближайший автомат…</p>
+          <div class="nearest__actions">
+            <a class="nearest__route" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden>Маршрут пешком</a>
+            <button class="nearest__next" id="nearestNext" type="button" hidden>Другая точка</button>
+            <a class="nearest__app" href="/app/">Маршрут в приложении</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero__actions">
+        <a class="btn btn--sunset" href="#b2b" data-topic="Обслуживание">Обслуживание и ремонт</a>
+        <a class="btn btn--ghost" href="#b2b" data-topic="Установка">Разместить аппарат у себя</a>
+      </div>
+    </div>
+
+    <figure class="hero__cup" aria-hidden="true">
+      <picture>
+        <source srcset="/images/web/cup-logo.webp" type="image/webp">
+        <img src="/images/web/cup-logo.jpg" alt="Стакан кофе Fastcup с логотипом" width="736" height="1308" fetchpriority="high">
+      </picture>
+      <figcaption>[[++fc_price_200]] ₽ · 200 мл<br>[[++fc_price_300]] ₽ · 300 мл</figcaption>
+    </figure>
+
+    <a class="hero__scroll" href="#beans">Листайте вниз</a>
+  </section>

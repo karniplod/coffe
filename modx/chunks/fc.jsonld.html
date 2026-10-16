@@ -1,0 +1,48 @@
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "[[++site_url]]#org",
+        "name": "Fastcup",
+        "url": "[[++site_url]]",
+        "logo": "[[++site_url]]images/web/logo-full-dark.png",
+        "description": "Сеть кофейных автоматов самообслуживания в Перми. Собственное производство аппаратов, установка автоматов у партнёров, обслуживание и ремонт, продажа ингредиентов.",
+        "areaServed": { "@type": "City", "name": "Пермь" },
+        "telephone": "[[++fc_phone_raw]]",
+        "email": "[[++fc_email]]",
+        "sameAs": ["[[++fc_telegram_url]]", "[[++fc_max_url]]"]
+      },
+      {
+        "@type": "CafeOrCoffeeShop",
+        "@id": "[[++site_url]]#coffee",
+        "name": "Fastcup — кофе с собой",
+        "parentOrganization": { "@id": "[[++site_url]]#org" },
+        "image": "[[++site_url]]images/web/vending-interior.jpg",
+        "url": "[[++site_url]]",
+        "telephone": "[[++fc_phone_raw]]",
+        "priceRange": "[[++fc_price_200]]–[[++fc_price_300]] ₽",
+        "servesCuisine": "Кофе",
+        "paymentAccepted": "Наличные, банковская карта, оплата телефоном",
+        "address": { "@type": "PostalAddress", "addressLocality": "Пермь", "addressRegion": "Пермский край", "addressCountry": "RU" },
+        "hasMenu": {
+          "@type": "Menu",
+          "hasMenuSection": {
+            "@type": "MenuSection",
+            "name": "Напитки 200 и 300 мл",
+            "hasMenuItem": [
+              [[fcMenuLd]]
+            ]
+          }
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          [[fcFaq? &mode=`ld`]]
+        ]
+      }
+    ]
+  }
+  </script>

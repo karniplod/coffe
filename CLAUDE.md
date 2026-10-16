@@ -27,12 +27,23 @@ tools/build_map.py  рисует карту из OpenStreetMap: `python tools/bu
 app/                приложение (PWA): index.html, app.js, app.css, route-worker.js (маршрут в фоне),
                     sw.js (офлайн), manifest.webmanifest, icons/, data/walk-graph.bin (граф — руками не править)
 robots.txt, sitemap.xml
+images/export/      вся графика отдельными файлами: svg/ и png/ (напитки, иконки, логотип в векторе), png/photos/ — создаёт tools/export_images.py
+tools/export_images.py  выгрузка графики в SVG и PNG (нужны numpy, potracer, playwright)
+tools/modx_build.py пакет для переноса на MODX 3: режет index.html на шаблон и чанки → modx/ и архив dist/fastcup-modx.zip
+tools/modx/         исходники пакета MODX, которые пишутся руками: установщик, сниппеты, плагин, служебные чанки, пресет формы, INSTALL.md
+modx/               готовый пакет MODX (создаёт tools/modx_build.py — руками не править; архив dist/ не коммитится)
 ```
 
 ## Приложение (app/)
 - Общие с сайтом файлы (points.js, map-data.js, omap.js, omap.css, картинки карты) подключаются через `../`.
 - Изменил что-то, что сохраняется на телефоне (карту, граф, файлы app/), — увеличь `VERSION` в `app/sw.js`.
 - Плавность проверяй замером кадров: у владельца слабая видеокарта.
+
+## Перенос на MODX 3 (modx/)
+- Сайт на хостинге Beget переезжает на MODX 3. Инструкция для владельца — `tools/modx/INSTALL.md` (кладётся в архив).
+- Поменял `index.html`, `js/config.js` или `js/points.js` — запусти `python tools/modx_build.py`: он пересоберёт `modx/` и `dist/fastcup-modx.zip`. Если сборщик пишет «index.html изменился» — поправь превращения в `tools/modx_build.py`.
+- В MODX напитки и точки — страницы разделов «Меню» и «Точки» с полями (TV) `fc_drink_*` и `fc_point_*`; контакты и цены — ClientConfig (`fc_phone`, `fc_email`, `fc_price_200`…). `js/points.js` и `js/config.js` на сервере пересоздаёт плагин `fcStatic`.
+- Установщик проверяй на локальном MODX: `C:\cloud\modx-test` (PHP 8.3, MariaDB на порту 3307, MODX 3.2.4; сервер — `php -S 127.0.0.1:8090 -t www router.php`).
 
 ## Как проверить сайт
 ```
@@ -64,5 +75,5 @@ python -m http.server 8000
 ## Что ещё не сделано (из README)
 - Реальные адреса и координаты в `js/points.js`.
 - Реальный Telegram (телефон, email и Max уже указаны).
-- Обработчик формы заявок (`formEndpoint`) и страница политики персональных данных (152-ФЗ).
+- Обработчик формы и страница политики (152-ФЗ) готовы в пакете MODX; реквизиты в политике — заполнить после переноса.
 - Свой домен вместо example.ru, Яндекс Вебмастер, Метрика.

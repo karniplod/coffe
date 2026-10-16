@@ -1,0 +1,43 @@
+<a class="skip" href="#main">К содержимому</a>
+
+<header class="topbar">
+  <!-- логотип по центру, пункты меню поровну слева и справа -->
+  <div class="topbar__side topbar__side--left">
+    <button class="burger" aria-label="Открыть меню" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
+    <nav class="nav" aria-label="Разделы">
+      <span class="nav__pill" aria-hidden="true"></span>
+      <a href="#top" data-spy="top">Главная</a>
+      <a href="#about" data-spy="about">О нас</a>
+      <a href="#how" data-spy="how">Как это работает</a>
+    </nav>
+  </div>
+  <a class="brand" href="#top" aria-label="Fastcup — на главную">
+    <span class="brand__logo" aria-hidden="true">
+      <img class="brand__logo-light" src="/images/web/logo-word-light.png" alt="" width="480" height="223">
+      <img class="brand__logo-dark" src="/images/web/logo-word-dark.png" alt="" width="480" height="223">
+    </span>
+  </a>
+  <div class="topbar__side topbar__side--right">
+    <nav class="nav" aria-label="Разделы, продолжение">
+      <span class="nav__pill" aria-hidden="true"></span>
+      <a href="#menu" data-spy="menu">Меню</a>
+      <a href="#b2b" data-spy="b2b">Бизнесу</a>
+      <a href="#contacts" data-spy="contacts">Контакты</a>
+    </nav>
+    <a class="topbar__phone js-phone" href="tel:[[++fc_phone_raw]]">[[++fc_phone]]</a>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="Разделы" hidden>
+  <a href="#top">Главная</a>
+  <a href="#about">О нас</a>
+  <a href="#how">Как это работает</a>
+  <a href="#menu">Меню</a>
+  <a href="#b2b">Бизнесу</a>
+  <a href="#faq">Вопросы</a>
+  <a href="#contacts">Контакты</a>
+</nav>
+
+<a class="totop" href="#top" aria-label="Наверх">
+  <svg class="totop__ring" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="25"/><circle class="totop__progress" cx="28" cy="28" r="25"/></svg>
+  <svg class="totop__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</a>

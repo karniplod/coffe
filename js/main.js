@@ -432,6 +432,7 @@
   var form = document.getElementById("leadForm");
   var status = document.getElementById("formStatus");
   form.addEventListener("submit", function (e) {
+    if (form.hasAttribute("data-si-form")) return;  // сайт на MODX: форму отправляет SendIt (modx/), он же проверяет поля
     e.preventDefault();
     var el = form.elements;
     var name = el["name"].value.trim(), phone = el["phone"].value.trim();

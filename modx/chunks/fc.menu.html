@@ -1,0 +1,24 @@
+  <!-- 4. Меню -->
+  <section class="menu" id="menu" data-tone="accent">
+    <div class="menu__inner">
+      <div class="menu__head">
+        <h2>Меню</h2>
+        <p class="section-lead">[[fcCount? &parent=`[[++fc_menu_id]]`]] в стаканах 200 и 300 мл. Сироп добавим по желанию, а каждый 7-й напиток — бесплатно.</p>
+        <div class="price-tag" aria-label="Любой напиток: 200 миллилитров — [[++fc_price_200]] рублей, 300 миллилитров — [[++fc_price_300]] рублей">
+          <span class="price-tag__row"><span class="price-tag__big">[[++fc_price_200]] ₽</span><span class="price-tag__small">200 мл</span></span>
+          <span class="price-tag__row"><span class="price-tag__big">[[++fc_price_300]] ₽</span><span class="price-tag__small">300 мл</span></span>
+        </div>
+      </div>
+      <ul class="drinks">
+[[pdoResources? &parents=`[[++fc_menu_id]]` &depth=`0` &tpl=`fc.drink` &sortby=`menuindex` &sortdir=`ASC` &limit=`0` &includeTVs=`fc_drink_desc,fc_drink_img,fc_drink_layers` &tvPrefix=`` &showHidden=`1`]]
+      </ul>
+      <div class="bonus-box">
+        <picture class="bonus__pic">
+          <source srcset="/images/web/bonus.webp" type="image/webp">
+          <img src="/images/web/bonus.jpg" alt="Акция Fastcup: 7-й кофе в подарок, только при оплате картой" width="600" height="630" loading="lazy">
+        </picture>
+        <p class="bonus"><span class="bonus__num">7-й</span> напиток бесплатно</p>
+        <p class="bonus__note">Только при оплате картой: автомат запомнит вашу карту и с каждой покупки начислит бонусы.</p>
+      </div>
+    </div>
+  </section>
