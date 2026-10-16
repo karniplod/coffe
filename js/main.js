@@ -13,6 +13,11 @@
   });
   document.querySelectorAll(".js-tg").forEach(function (a) { a.href = CFG.telegram; });
   document.querySelectorAll(".js-max").forEach(function (a) { a.href = CFG.max; });
+  document.querySelectorAll(".js-email").forEach(function (a) {
+    a.href = "mailto:" + CFG.email;
+    var span = a.querySelector("span");
+    (span || a).textContent = CFG.email;
+  });
   var y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
 
   /* ---------- мобильное меню ---------- */
