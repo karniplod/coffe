@@ -64,11 +64,11 @@
   function navHovered() { return navs.some(function (nav) { return nav.matches(":hover"); }); }
   navs.forEach(function (nav) { nav.addEventListener("mouseleave", restPill); });
 
-  /* какой раздел сейчас на экране */
-  var spyTargets = navLinks.map(function (a) {
-    var id = a.dataset.spy;
-    return { a: a, el: id === "top" ? document.querySelector(".hero") : document.getElementById(id) };
-  }).filter(function (t) { return t.el; });
+  /* какой раздел сейчас на экране: первый экран — логотип (он же ссылка наверх), дальше — пункты меню */
+  var brand = document.querySelector(".brand");
+  var spyTargets = [{ a: brand, el: document.querySelector(".hero") }].concat(navLinks.map(function (a) {
+    return { a: a, el: document.getElementById(a.dataset.spy) };
+  })).filter(function (t) { return t.a && t.el; });
   /* Шапка: прилипает и поджимается при прокрутке, а цвет — инверсия блока под ней (data-tone в разметке) */
   var topbar = document.querySelector(".topbar");
   var mnavEl = document.getElementById("mnav");

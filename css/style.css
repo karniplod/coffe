@@ -133,7 +133,10 @@ p { margin: 0; }
 .topbar__side--right { justify-content: flex-start; }
 .brand { display: flex; align-items: center; text-decoration: none; color: inherit; padding: 0 6px; }
 /* логотип — надпись «Fastcup» (пропорции 480×223) */
-.brand__logo { display: grid; width: 106px; height: 49px; transition: width .45s var(--bar-ease), height .45s var(--bar-ease); }
+.brand__logo { display: grid; width: 106px; height: 49px; transition: width .45s var(--bar-ease), height .45s var(--bar-ease), filter .25s ease, transform .25s ease; }
+/* логотип — ссылка наверх: подсвечивается при наведении и пока открыт первый экран */
+.brand:hover .brand__logo, .brand:focus-visible .brand__logo, .brand.is-active .brand__logo { filter: drop-shadow(0 0 7px rgba(246, 166, 90, .85)); }
+.brand:hover .brand__logo { transform: scale(1.05); }
 .brand__logo img { grid-area: 1 / 1; width: 100%; height: 100%; transition: opacity .15s ease; }
 .brand__logo-light { opacity: var(--logo-light); }
 .brand__logo-dark { opacity: calc(1 - var(--logo-light)); }
@@ -282,7 +285,7 @@ p { margin: 0; }
   color: var(--foam); overflow: hidden;
 }
 .beans__text { max-width: 30rem; justify-self: end; }
-.beans__text h2 { color: var(--apricot); font-size: clamp(42px, 4.4vw, 66px); line-height: 1.05; }  /* длинный заголовок — мельче обычного h2 */
+.beans__text h2 { color: var(--apricot); font-size: clamp(34px, 3.5vw, 52px); line-height: 1.08; }  /* длинный заголовок — мельче обычного h2 */
 .beans__text p { margin-top: 22px; font-size: 19px; color: rgba(255,246,236,.78); }
 .beans__hint { font: 700 26px/1 var(--hand) !important; color: var(--crema) !important; margin-top: 36px !important; }
 .beans__stage { position: relative; aspect-ratio: 1 / 1; width: min(100%, 640px); justify-self: start; touch-action: pan-y; cursor: pointer; }
