@@ -155,7 +155,7 @@
 
   /* =========================================================
      КАРТА: своя офлайн-карта Перми (движок — js/omap.js) + метки автоматов поверх.
-     Двигается мышкой (на телефоне двумя пальцами), не дальше границ города.
+     Двигается мышкой, на телефоне — как в приложении: один палец двигает, два — масштаб; не дальше границ города.
      ========================================================= */
   var nearestLabel = document.getElementById("nearestLabel");
   var nearestRoute = document.getElementById("nearestRoute");
@@ -222,7 +222,9 @@
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .3 });
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .3 });
+    // iPhone: щипок по карте масштабирует карту, а не всю страницу
+    mapEl.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
     // кнопка «Все точки» под «+» и «−»: вернуть карту к виду со всеми автоматами
     var zoomBox = mapEl.querySelector(".omap__zoom");
     if (zoomBox && count > 1) {
