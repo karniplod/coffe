@@ -39,6 +39,8 @@
   </button>
 
   <section class="sheet" id="sheet" aria-live="polite">
+    <!-- «ручка»: свернуть/развернуть панель (сворачивается и сама, когда двигаете карту) -->
+    <button class="sheet__handle" id="handle" type="button" aria-label="Свернуть панель" aria-expanded="true"><span></span></button>
     <p class="sheet__status" id="status">Загружаем карту…</p>
     <div class="sheet__card" id="card" hidden>
       <p class="sheet__kicker"><span id="kicker">Ближайший кофе</span><span class="badge" id="open" hidden></span></p>

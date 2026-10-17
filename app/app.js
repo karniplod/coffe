@@ -85,7 +85,7 @@
       return wide() ? [top, 90, 30, 420] : [top, 90, sheet.offsetHeight + 30, 40];   // справа — кнопки масштаба
     },
     minFitScale: 0.08,   // можно отдалить, чтобы вы и далёкая точка поместились целиком
-    onUserMove: function () { setFollow(false); },
+    onUserMove: function () { setFollow(false); collapse(true); },   // двигаете или увеличиваете карту — панель уходит вниз
     onTap: function (c) { if (mode !== "gps") moveByHand(c); }, // без GPS метку можно и просто поставить нажатием
     onError: function () { failed("Карта не загрузилась. Проверьте интернет и нажмите «Перезагрузить»."); }
   });
@@ -108,6 +108,32 @@
   function placeLocate() { document.documentElement.style.setProperty("--sheet-h", sheet.offsetHeight + "px"); }
   if (window.ResizeObserver) new ResizeObserver(placeLocate).observe(sheet);
   placeLocate();
+
+  /* ---------- панель снизу сворачивается: двигаете карту — она уходит вниз, остаются название и расстояние ----------
+     Развернуть — тап по панели или свайп вверх; свернуть — «ручка» или свайп вниз. Выбрали точку — панель разворачивается сама. */
+  var handle = $("handle"), collapsed = false;
+  function collapse(on) {
+    if (on && card.hidden && listEl.hidden) return;   // сворачивать нечего (карточки ещё нет)
+    if (collapsed === on) return;
+    collapsed = on;
+    if (on && !listEl.hidden) { listEl.hidden = true; card.hidden = !results; }   // открытый список сворачивается в карточку
+    sheet.classList.toggle("is-collapsed", on);
+    handle.setAttribute("aria-expanded", String(!on));
+    handle.setAttribute("aria-label", on ? "Развернуть панель" : "Свернуть панель");
+  }
+  handle.addEventListener("click", function (e) { e.stopPropagation(); collapse(!collapsed); });
+  sheet.addEventListener("click", function (e) { if (collapsed && !e.target.closest("a")) { e.preventDefault(); e.stopPropagation(); collapse(false); } }, true);
+  var swipe = null;
+  sheet.addEventListener("touchstart", function (e) {
+    var list = e.target.closest(".list__items");
+    swipe = list && list.scrollTop > 0 ? null : { y: e.touches[0].clientY };   // прокрутку списка не путаем со свайпом
+  }, { passive: true });
+  sheet.addEventListener("touchend", function (e) {
+    if (!swipe) return;
+    var dy = e.changedTouches[0].clientY - swipe.y;
+    swipe = null;
+    if (dy > 40) collapse(true); else if (dy < -40) collapse(false);
+  });
 
   /* ---------- маршрут в фоне ---------- */
   var worker = new Worker("route-worker.js");
@@ -158,6 +184,7 @@
   /* Показать выбранную точку: карточка, линия маршрута, подсветка метки. fit — подвинуть карту к маршруту */
   function show(fit) {
     var r = find(sel); if (!r) return;
+    if (fit) collapse(false);   // выбрали точку — показываем карточку целиком
     var p = POINTS[r.i];
     card.hidden = !listEl.hidden;   // открыт список точек — карточку не показываем поверх
     $("kicker").textContent = r.i === results[0].i ? "Ближайший кофе" : "Ещё одна точка";
@@ -235,7 +262,7 @@
       itemsEl.appendChild(li);
     });
   }
-  listBtn.addEventListener("click", function () { card.hidden = true; listEl.hidden = false; renderList(); });
+  listBtn.addEventListener("click", function () { collapse(false); card.hidden = true; listEl.hidden = false; renderList(); });
   $("listClose").addEventListener("click", function () { listEl.hidden = true; card.hidden = !results; });
   $("filters").hidden = !FEAT.promos;
   function chip(id, set) {
