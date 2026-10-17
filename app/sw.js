@@ -3,16 +3,19 @@
    При установке сохраняет на телефоне всё нужное: страницу, скрипты, точки, граф пеших дорог
    и все картинки карты (≈ 3,5 МБ). Дальше:
      - картинки карты — сразу из сохранённого (они не меняются, пока не пересобрана карта);
-     - остальное — сразу из сохранённого, а в фоне обновляется из сети (новые точки из
-       js/points.js появятся при следующем запуске).
-   Пересобрали карту или граф (tools/build_map.py, tools/build_routes.py) — увеличьте VERSION.
+     - точки и контакты (js/points.js, js/config.js) — сначала из сети (ждём до 3 секунд), без сети — сохранённые:
+       новую точку, добавленную в админке, видно с первого же открытия;
+     - остальное — сразу из сохранённого, а в фоне обновляется из сети.
+   Поменяли файлы приложения или граф (tools/build_routes.py) — увеличьте VERSION.
+   Пересобрали карту (tools/build_map.py) — увеличьте TILES_VERSION (картинки карты скачаются заново, ≈ 4 МБ).
    ================================================================ */
 self.window = self;                  // js/map-data.js пишет в window, а здесь его нет
 importScripts("../js/map-data.js"); // FASTCUP_MAP: уровни и размеры картинок карты
 
-var VERSION = "4";
+var VERSION = "5";
+var TILES_VERSION = "4";   // отдельно от VERSION: смена скриптов не заставляет телефон заново качать карту
 var CORE = "fastcup-app-" + VERSION;
-var TILES = "fastcup-tiles-" + VERSION;
+var TILES = "fastcup-tiles-" + TILES_VERSION;
 var FILES = [
   "./", "index.html", "app.css", "app.js", "route-worker.js", "manifest.webmanifest", "data/walk-graph.bin",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-180.png",
@@ -73,6 +76,22 @@ self.addEventListener("fetch", function (e) {
         if (res.ok) { var copy = res.clone(); caches.open(TILES).then(function (c) { c.put(req, copy); }); }
         return res;
       });
+    }));
+    return;
+  }
+
+  // точки и контакты: сначала свежие из сети (не дольше 3 секунд), иначе — сохранённые
+  if (/\/js\/(points|config)\.js$/.test(new URL(req.url).pathname)) {
+    e.respondWith(caches.open(CORE).then(function (cache) {
+      var net = fetch(req, { cache: "no-store" }).then(function (res) {
+        if (res.ok) cache.put(req, res.clone());
+        return res;
+      });
+      var slow = new Promise(function (ok) { setTimeout(ok, 3000); }).then(function () { return cache.match(req, { ignoreSearch: true }); });
+      // кто первым даст ответ: сеть, а если она молчит 3 секунды или недоступна — сохранённое
+      return Promise.race([net.catch(function () { return cache.match(req, { ignoreSearch: true }); }), slow.then(function (hit) { return hit || net; })])
+        .then(function (res) { return res || net; })
+        .catch(function () { return cache.match(req, { ignoreSearch: true }).then(function (hit) { return hit || Response.error(); }); });
     }));
     return;
   }
