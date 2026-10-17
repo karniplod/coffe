@@ -579,8 +579,13 @@ p { margin: 0; }
   .topbar__phone { display: none; }
   .brand__logo { width: 92px; height: 43px; }
   .is-compact .brand__logo { width: 86px; height: 40px; }
-  .hero__title { font-size: 56px; }
-  .hero__lead { font-size: 17px; }
+  /* первый экран на телефоне: карта пониже, заголовок компактнее — чтобы сразу был виден адрес ближайшей точки */
+  .hero__map { height: 50svh; min-height: 300px; }
+  .hero__panel { margin-top: -40px; padding: 20px 18px 24px; }
+  .hero__title { font-size: clamp(32px, 9.4vw, 40px); line-height: .98; }
+  .hero__lead { margin-top: 10px; font-size: 15px; line-height: 1.45; }
+  .nearest { margin-top: 14px; padding: 12px 14px; }
+  .hero__actions { margin-top: 18px; }
   .hero__actions .btn { width: 100%; }
   .about__machine { padding: 0; display: flex; flex-direction: column; align-items: center; }
   .about__machine img { max-width: 240px; }
