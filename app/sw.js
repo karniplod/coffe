@@ -13,7 +13,7 @@
 self.window = self;                  // js/map-data.js пишет в window, а здесь его нет
 importScripts("../js/map-data.js"); // FASTCUP_MAP: уровни и размеры картинок карты
 
-var VERSION = "6";
+var VERSION = "7";
 var TILES_VERSION = "4";   // отдельно от VERSION: смена скриптов не заставляет телефон заново качать карту
 var DATA_VERSION = "1";    // граф пеших дорог: увеличьте после tools/build_routes.py
 var CORE = "fastcup-app-" + VERSION;

@@ -79,7 +79,12 @@
   var omap = FastcupMap($("map"), {
     data: MAP, base: "../", oneFinger: true, wheel: true, maxScale: 8,
     // свободная от шапки и карточки часть экрана — туда помещаем маршрут
-    margin: function () { return wide() ? [90, 70, 40, 420] : [90, 20, sheet.offsetHeight + 30, 20]; },
+    // сверху — шапка и высота выбранной метки (≈ 70 px над точкой), снизу — карточка и точка «Я здесь» с подписью
+    margin: function () {
+      var top = document.querySelector(".bar").getBoundingClientRect().bottom + 84;
+      return wide() ? [top, 90, 30, 420] : [top, 90, sheet.offsetHeight + 30, 40];   // справа — кнопки масштаба
+    },
+    minFitScale: 0.08,   // можно отдалить, чтобы вы и далёкая точка поместились целиком
     onUserMove: function () { setFollow(false); },
     onTap: function (c) { if (mode !== "gps") moveByHand(c); }, // без GPS метку можно и просто поставить нажатием
     onError: function () { failed("Карта не загрузилась. Проверьте интернет и нажмите «Перезагрузить»."); }

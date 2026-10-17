@@ -218,20 +218,21 @@
      Видимая часть — между шапкой и панелью с текстом. Метка рисуется над своей точкой (выбранная — ≈ 70 px вверх),
      поэтому сверху отступ больше на высоту метки: тогда в центре оказывается сама метка, а не её острие. */
   var PIN_H = 84;   // выбранная метка увеличена в 1,25 раза (≈ 70 px) + зазор до шапки
+  var ME_PAD = 22;  // снизу: точка «вы здесь» (≈ 22 px с ободком) и острие метки не должны уходить под панель
   function panelMargin() {
     var panel = document.querySelector(".hero__panel"), bar = document.querySelector(".topbar");
     var map = mapEl.getBoundingClientRect(), p = panel.getBoundingClientRect();
     var top = Math.max(0, bar.getBoundingClientRect().bottom - map.top) + PIN_H;
     if (window.innerWidth <= 960) {  // панель под картой и заходит на неё снизу (см. @media 960px в style.css)
-      var bottom = Math.max(10, map.bottom - p.top + 2);
-      return [top, 64, bottom, 64];   // справа — кнопки масштаба; слева столько же, чтобы точка была по центру
+      var bottom = Math.max(10, map.bottom - p.top) + ME_PAD;
+      return [top, 84, bottom, 84];   // справа — кнопки масштаба (метка шириной ≈ 58 px их не задевает); слева столько же — точка по центру
     }
     var cupRight = window.innerWidth > 1080 ? 300 : 90;     // справа место под карточку стаканчика (если видна) и кнопки масштаба
-    return [top, cupRight, 10, p.right - map.left + 40];
+    return [top, cupRight, ME_PAD, p.right - map.left + 40];
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .3 });
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .08 });   // .08 — можно отдалить, чтобы далёкие точки поместились целиком
     // iPhone: щипок по карте масштабирует карту, а не всю страницу
     mapEl.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
     // кнопка «Все точки» под «+» и «−»: вернуть карту к виду со всеми автоматами
