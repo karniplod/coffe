@@ -369,6 +369,42 @@ $manifest = <<<'JSON'
    "description": "«широта, долгота», например «58.0119, 56.2452». В Яндекс Картах: правый клик по месту → «Что здесь?» → скопировать числа",
    "elements": "",
    "default": ""
+  },
+  {
+   "name": "fc_point_promo",
+   "caption": "Акция в этой точке",
+   "type": "text",
+   "templates": [
+    "fc-point"
+   ],
+   "category": "Поля",
+   "description": "Необязательно. Видна в приложении, если включены акции («Конфигурация» → «Приложение»). Например «Капучино 300 мл за 120 ₽ до 11:00»",
+   "elements": "",
+   "default": ""
+  },
+  {
+   "name": "fc_point_price_200",
+   "caption": "Цена 200 мл здесь, ₽",
+   "type": "text",
+   "templates": [
+    "fc-point"
+   ],
+   "category": "Поля",
+   "description": "Необязательно: только если в этой точке цена не как везде. Только число",
+   "elements": "",
+   "default": ""
+  },
+  {
+   "name": "fc_point_price_300",
+   "caption": "Цена 300 мл здесь, ₽",
+   "type": "text",
+   "templates": [
+    "fc-point"
+   ],
+   "category": "Поля",
+   "description": "Необязательно: только если в этой точке цена не как везде. Только число",
+   "elements": "",
+   "default": ""
   }
  ],
  "settings": [
@@ -429,6 +465,22 @@ $manifest = <<<'JSON'
    "help": "«широта, долгота» — если точек нет: 58.0105, 56.2294"
   },
   {
+   "key": "fc_promos",
+   "value": "0",
+   "name": "Акции и цены точек в приложении",
+   "cc": "Приложение",
+   "xtype": "xcheckbox",
+   "help": "Значок «%» на метке, акция и цена в карточке, фильтры «Только с акциями» и «Сначала дешевле». Акции — в поле точки «Акция в этой точке»"
+  },
+  {
+   "key": "fc_open_now",
+   "value": "0",
+   "name": "«Открыто / Закрыто» в приложении",
+   "cc": "Приложение",
+   "xtype": "xcheckbox",
+   "help": "По часам работы точки: «Круглосуточно» или «07:00–23:00»"
+  },
+  {
    "key": "fc_menu_id",
    "value": "",
    "name": "ID раздела «Меню»",
@@ -452,7 +504,8 @@ $manifest = <<<'JSON'
  ],
  "cc_groups": {
   "Контакты": "Телефон, почта, MAX и Telegram — на сайте, в форме и в приложении",
-  "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты"
+  "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты",
+  "Приложение": "Дополнительные возможности приложения /app/ — по умолчанию выключены"
  },
  "managed_files": [
   "js/points.js",
@@ -761,7 +814,7 @@ try {
             $sys = $modx->getObject(modSystemSetting::class, $s['key']);
             if ($sys && (string)$sys->get('value') !== '') $value = (string)$sys->get('value');
             $o = $modx->newObject('cgSetting');
-            $o->fromArray(['key' => $s['key'], 'label' => $s['name'], 'description' => $s['help'], 'xtype' => 'textfield',
+            $o->fromArray(['key' => $s['key'], 'label' => $s['name'], 'description' => $s['help'], 'xtype' => $s['xtype'] ?? 'textfield',
                            'value' => $value, 'default' => '', 'group' => $ccIds[$grp], 'sortorder' => $ccSort[$grp]]);
             if (saved($o, "поле ClientConfig {$s['key']}")) say('new', "ClientConfig «{$grp}»: {$s['name']} = «{$value}»");
         } catch (Throwable $e) { say('error', "ClientConfig {$s['key']}: " . $e->getMessage()); }
@@ -770,7 +823,7 @@ try {
         if ($inCc($s)) continue;
         if ($modx->getObject(modSystemSetting::class, $s['key'])) { say('skip', "настройка {$s['key']} уже есть — не трогаю"); continue; }
         $o = $modx->newObject(modSystemSetting::class);
-        $o->fromArray(['key' => $s['key'], 'value' => $s['value'], 'xtype' => 'textfield', 'namespace' => 'core', 'area' => 'Fastcup'], '', true);
+        $o->fromArray(['key' => $s['key'], 'value' => $s['value'], 'xtype' => ($s['xtype'] ?? '') === 'xcheckbox' ? 'combo-boolean' : 'textfield', 'namespace' => 'core', 'area' => 'Fastcup'], '', true);
         if (saved($o, "настройку {$s['key']}")) say('new', "настройка {$s['key']} = «{$s['value']}»");
         $modx->setOption($s['key'], $s['value']);
     }
@@ -876,7 +929,11 @@ try {
 
     // --- 14. js/points.js и js/config.js из админки
     if ($dry) say('upd', 'js/points.js и js/config.js — соберу из страниц «Точки» и настроек');
-    elseif ($snippetExists('fcWriteStatic')) say('upd', 'файлы карты: ' . $modx->runSnippet('fcWriteStatic', ['what' => 'all']));
+    elseif ($snippetExists('fcWriteStatic')) {
+        // сниппет только что обновлён, а MODX исполнил бы старую копию из кэша скриптов — сначала чистим её
+        try { $modx->cacheManager->refresh(['scripts' => []]); } catch (Throwable $e) {}
+        say('upd', 'файлы карты: ' . $modx->runSnippet('fcWriteStatic', ['what' => 'all']));
+    }
 } catch (Throwable $e) {
     say('error', 'установка прервана: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . '). Уже сделанное сохранено, резервная копия — ' . str_replace(MODX_CORE_PATH, 'core/', $backupDir));
 }

@@ -6,6 +6,9 @@
    «Я здесь» — метка на карте. Её ставит GPS, а если геопозиции нет (запрещена, не определилась,
    вы не в Перми) — она стоит в центре города. Метку всегда можно перетащить (или нажать на карту
    без GPS): маршрут пересчитывается на ходу. «Отмена» возвращает метку назад.
+
+   Дополнительно (включаются в js/config.js → features, по умолчанию выключены):
+   promos — акции и цены точек (поля promo, price200, price300 в js/points.js), openNow — «Открыто/Закрыто» по часам.
    ================================================================ */
 (function () {
   "use strict";
@@ -18,10 +21,35 @@
   var KEEP_CHOICE_M = 500;        // выбранная вручную точка держится, пока не ушли дальше — потом снова ближайшая
   var GPS_WAIT_MS = 8000;         // столько ждём GPS, потом ставим метку в центр города
   var POOR_GPS_M = 100;           // точность хуже — подсказываем, что метку можно поправить
+  var FEAT = CFG.features || {};
+  var PRICES = CFG.prices || {};
+
+  /* Открыто ли сейчас по строке часов: «Круглосуточно», «07:00–23:00», «05:00–00:00» (через полночь).
+     true / false; null — часы не разобрать (тогда ничего не показываем) */
+  function openNow(hours, d) {
+    if (!hours) return null;
+    if (/кругл|24\s*\/\s*7|24\s*ч/i.test(hours)) return true;
+    var m = /(\d{1,2})[:.](\d{2})\s*[–—-]\s*(\d{1,2})[:.](\d{2})/.exec(hours);
+    if (!m) return null;
+    d = d || new Date();
+    var now = d.getHours() * 60 + d.getMinutes(), from = +m[1] * 60 + +m[2], to = +m[3] * 60 + +m[4];
+    if (to === from) return true;
+    return from < to ? now >= from && now < to : now >= from || now < to;
+  }
+  function priceOf(p, ml) { return +(p["price" + ml] || PRICES[ml] || 0); }
+  function priceText(p) {
+    var a = priceOf(p, 200), b = priceOf(p, 300);
+    return [a ? "200 мл — " + a + " ₽" : "", b ? "300 мл — " + b + " ₽" : ""].filter(Boolean).join(" · ");
+  }
+  function cheaper(p) { // дешевле обычного: своя цена ниже цены по умолчанию
+    return (p.price200 && PRICES["200"] && +p.price200 < +PRICES["200"]) || (p.price300 && PRICES["300"] && +p.price300 < +PRICES["300"]);
+  }
 
   function $(id) { return document.getElementById(id); }
   var sheet = $("sheet"), statusEl = $("status"), card = $("card"), locateBtn = $("locate");
   var undoBtn = $("undo"), autoBtn = $("auto"), reloadBtn = $("reload"), help = $("help");
+  var listEl = $("list"), itemsEl = $("items"), listBtn = $("listBtn");
+  var onlyPromo = false, cheapFirst = false;
 
   var me = null, meMarker = null;
   var mode = null;                // "gps" — метку ставит GPS, "manual" — поставлена вручную (или центр города)
@@ -62,8 +90,9 @@
     b.type = "button";
     b.className = "omap__pin";
     b.title = p.title;
-    b.setAttribute("aria-label", p.title + ", " + p.address);
+    b.setAttribute("aria-label", p.title + ", " + p.address + (FEAT.promos && p.promo ? ". Акция: " + p.promo : ""));
     b.innerHTML = FastcupMap.PIN;
+    if (FEAT.promos && (p.promo || cheaper(p))) b.classList.add("has-promo");   // значок «%» на метке
     b.addEventListener("click", function () { if (results && find(i)) { sel = i; chosenAt = me; show(true); } });
     pins.push(b);
   });
@@ -125,13 +154,24 @@
   function show(fit) {
     var r = find(sel); if (!r) return;
     var p = POINTS[r.i];
-    card.hidden = false;
+    card.hidden = !listEl.hidden;   // открыт список точек — карточку не показываем поверх
     $("kicker").textContent = r.i === results[0].i ? "Ближайший кофе" : "Ещё одна точка";
     $("title").textContent = p.title;
     $("addr").textContent = p.address + (p.hours ? " · " + p.hours : "");
     $("dist").textContent = fmtDist(r.meters);
     $("time").textContent = r.straight ? "по прямой" : "≈ " + Math.max(1, Math.round(r.meters / WALK_M_PER_MIN)) + " мин пешком";
     $("next").hidden = results.length < 2;
+    var open = FEAT.openNow ? openNow(p.hours) : null;
+    $("open").hidden = open === null;
+    $("open").textContent = open ? "Открыто" : "Закрыто";
+    $("open").classList.toggle("is-closed", open === false);
+    $("promo").hidden = !(FEAT.promos && p.promo);
+    $("promo").textContent = p.promo || "";
+    $("price").hidden = !(FEAT.promos && priceText(p));
+    $("price").textContent = FEAT.promos ? priceText(p) : "";
+    $("ext").href = "https://yandex.ru/maps/?rtext=" + me.join(",") + "~" + p.coords.join(",") + "&rtt=pd";
+    listBtn.hidden = POINTS.length < 2;
+    if (!listEl.hidden) renderList();
     omap.setRoute(r.points || [omap.toXY(me), omap.toXY(p.coords)]);
     pins.forEach(function (b, k) { b.firstChild.classList.toggle("is-selected", k === r.i); });
     if (fit) fitRoute(r);
@@ -150,6 +190,54 @@
     chosenAt = me;
     show(true);
   });
+
+  /* ---------- все точки списком: по расстоянию (пешком, если маршруты готовы), с фильтрами акций ---------- */
+  function renderList() {
+    var rows = POINTS.map(function (p, i) {
+      var r = find(i);
+      return { i: i, p: p, m: r ? r.meters : (me ? distance(me, p.coords) : 0), walk: r && !r.straight };
+    });
+    if (FEAT.promos && onlyPromo) rows = rows.filter(function (x) { return x.p.promo || cheaper(x.p); });
+    rows.sort(function (a, b) {
+      if (FEAT.promos && cheapFirst) {
+        var d = (priceOf(a.p, 300) || priceOf(a.p, 200)) - (priceOf(b.p, 300) || priceOf(b.p, 200));
+        if (d) return d;
+      }
+      return a.m - b.m;
+    });
+    itemsEl.innerHTML = "";
+    if (!rows.length) { itemsEl.innerHTML = '<li class="list__empty">Сейчас акций нет.</li>'; return; }
+    rows.forEach(function (x) {
+      var li = document.createElement("li"), b = document.createElement("button");
+      b.type = "button";
+      b.className = "item" + (x.i === sel ? " is-selected" : "");
+      var open = FEAT.openNow ? openNow(x.p.hours) : null;
+      b.innerHTML = '<span class="item__main"><span class="item__title"></span><span class="item__addr"></span>'
+        + (FEAT.promos && x.p.promo ? '<span class="item__promo"></span>' : "") + "</span>"
+        + '<span class="item__side"><b class="item__dist"></b>'
+        + (open !== null ? '<span class="badge' + (open ? "" : " is-closed") + '">' + (open ? "Открыто" : "Закрыто") + "</span>" : "") + "</span>";
+      b.querySelector(".item__title").textContent = x.p.title;
+      b.querySelector(".item__addr").textContent = x.p.address + (x.p.hours ? " · " + x.p.hours : "");
+      if (FEAT.promos && x.p.promo) b.querySelector(".item__promo").textContent = x.p.promo;
+      b.querySelector(".item__dist").textContent = me ? fmtDist(x.m) + (x.walk ? "" : " ↗") : "";
+      b.addEventListener("click", function () {
+        if (!results || !find(x.i)) return;
+        sel = x.i; chosenAt = me;
+        listEl.hidden = true; card.hidden = false;
+        show(true);
+      });
+      li.appendChild(b);
+      itemsEl.appendChild(li);
+    });
+  }
+  listBtn.addEventListener("click", function () { card.hidden = true; listEl.hidden = false; renderList(); });
+  $("listClose").addEventListener("click", function () { listEl.hidden = true; card.hidden = !results; });
+  $("filters").hidden = !FEAT.promos;
+  function chip(id, set) {
+    $(id).addEventListener("click", function () { var on = this.getAttribute("aria-pressed") !== "true"; this.setAttribute("aria-pressed", String(on)); set(on); renderList(); });
+  }
+  chip("onlyPromo", function (v) { onlyPromo = v; });
+  chip("cheap", function (v) { cheapFirst = v; });
 
   /* ---------- метка «Я здесь» ---------- */
   function ensureMarker(c) {
@@ -324,19 +412,40 @@
   if (!POINTS.length) status("Точек на карте пока нет.");
   else startGps();
 
-  /* ---------- установка на телефон ---------- */
-  var installBtn = $("install"), tip = $("installTip"), deferred = null;
+  /* ---------- установка на телефон ----------
+     Android/Chrome: системное окно установки (beforeinstallprompt). iPhone: подсказка «Поделиться → На экран Домой».
+     Кнопка в шапке — всегда, пока не установлено; карточка в низу — один раз, через 20 секунд работы (не мешает с порога). */
+  var installBtn = $("install"), tip = $("installTip"), installCard = $("installCard"), deferred = null;
   var standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
-  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; installBtn.hidden = false; });
-  window.addEventListener("appinstalled", function () { installBtn.hidden = true; tip.hidden = true; });
-  if (ios && !standalone) installBtn.hidden = false; // на iPhone установка — через «Поделиться»
-  installBtn.addEventListener("click", function () {
+  var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var store = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+                set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  function canInstall() { return !standalone && (deferred || ios); }
+  function offerLater() {
+    if (store.get("fc-install-later") || !canInstall()) return;
+    setTimeout(function () { if (canInstall() && listEl.hidden) installCard.hidden = false; }, 20000);
+  }
+  function install() {
+    installCard.hidden = true;
     if (deferred) {
       deferred.prompt();
-      deferred.userChoice.then(function () { deferred = null; installBtn.hidden = true; });
-    } else tip.hidden = !tip.hidden;
-  });
+      deferred.userChoice.then(function (c) { deferred = null; if (c.outcome === "accepted") installBtn.hidden = true; });
+    } else tip.hidden = false;
+  }
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; installBtn.hidden = false; offerLater(); });
+  window.addEventListener("appinstalled", function () { installBtn.hidden = true; tip.hidden = true; installCard.hidden = true; standalone = true; });
+  if (ios && !standalone) { installBtn.hidden = false; offerLater(); }
+  installBtn.addEventListener("click", install);
+  $("installNow").addEventListener("click", install);
+  $("installLater").addEventListener("click", function () { installCard.hidden = true; store.set("fc-install-later", "1"); });
+  $("tipClose").addEventListener("click", function () { tip.hidden = true; });
 
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+  // iPhone: щипок по шапке или карточке увеличивал бы всю страницу — в приложении масштабируется только карта
+  document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
+
+  /* Офлайн: приложение готово без интернета сразу после первой загрузки, картинки карты докачиваются в фоне */
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+    navigator.serviceWorker.ready.then(function (reg) { if (reg.active) reg.active.postMessage({ type: "cache-map" }); });
+  }
 })();

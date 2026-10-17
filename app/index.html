@@ -22,9 +22,17 @@
 
   <header class="bar">
     <a class="bar__brand" href="../" aria-label="Сайт Fastcup"><img src="../images/web/logo-word-light.png" alt="Fastcup" width="480" height="223"></a>
-    <button class="bar__install" id="install" type="button" hidden>Установить</button>
+    <button class="bar__install" id="install" type="button" hidden><span aria-hidden="true">⤓</span> Установить</button>
   </header>
-  <p class="tip" id="installTip" hidden>Чтобы установить: нажмите «Поделиться» <span aria-hidden="true">⎋</span>, затем «На экран Домой».</p>
+  <!-- iPhone: устанавливают через «Поделиться» → «На экран Домой» — показываем по шагам -->
+  <div class="tip" id="installTip" hidden>
+    <p class="tip__title">Установить на iPhone — 2 шага</p>
+    <ol class="tip__steps">
+      <li>Нажмите <b>«Поделиться»</b> <svg class="tip__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 12v8h14v-8"/></svg> внизу экрана Safari</li>
+      <li>Выберите <b>«На экран Домой»</b> <svg class="tip__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg></li>
+    </ol>
+    <button class="tip__close" id="tipClose" type="button" aria-label="Закрыть подсказку">×</button>
+  </div>
 
   <button class="locate" id="locate" type="button" aria-label="Показать, где я">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
@@ -33,13 +41,39 @@
   <section class="sheet" id="sheet" aria-live="polite">
     <p class="sheet__status" id="status">Загружаем карту…</p>
     <div class="sheet__card" id="card" hidden>
-      <p class="sheet__kicker" id="kicker">Ближайший кофе</p>
+      <p class="sheet__kicker"><span id="kicker">Ближайший кофе</span><span class="badge" id="open" hidden></span></p>
       <h1 class="sheet__title" id="title"></h1>
       <p class="sheet__addr" id="addr"></p>
+      <p class="sheet__promo" id="promo" hidden></p>
       <p class="sheet__eta"><b id="dist"></b><span id="time"></span></p>
+      <p class="sheet__price" id="price" hidden></p>
       <div class="sheet__actions">
         <button class="btn btn--sunset" id="show" type="button">Показать маршрут</button>
         <button class="btn btn--ghost" id="next" type="button">Другая точка</button>
+      </div>
+      <div class="sheet__links">
+        <button class="link" id="listBtn" type="button" hidden>Все точки</button>
+        <a class="link" id="ext" href="#" target="_blank" rel="noopener">Открыть в Яндекс Картах</a>
+      </div>
+    </div>
+    <!-- все точки по расстоянию: открывается кнопкой «Все точки» -->
+    <div class="list" id="list" hidden>
+      <div class="list__head">
+        <p class="list__title">Все точки</p>
+        <button class="link" id="listClose" type="button">Свернуть</button>
+      </div>
+      <div class="list__filters" id="filters" hidden>
+        <button class="chip" id="onlyPromo" type="button" aria-pressed="false">Только с акциями</button>
+        <button class="chip" id="cheap" type="button" aria-pressed="false">Сначала дешевле</button>
+      </div>
+      <ul class="list__items" id="items"></ul>
+    </div>
+    <!-- предложение установить: один раз, если телефон умеет -->
+    <div class="promo-install" id="installCard" hidden>
+      <p><b>Установите приложение</b> — откроется с экрана телефона за секунду и работает без интернета.</p>
+      <div class="promo-install__actions">
+        <button class="btn btn--sunset" id="installNow" type="button">Установить</button>
+        <button class="link" id="installLater" type="button">Не сейчас</button>
       </div>
     </div>
     <!-- служебные кнопки: показываются, когда нужны -->

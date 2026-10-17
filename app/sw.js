@@ -1,23 +1,26 @@
 /* ================================================================
    Работа приложения без интернета (service worker).
-   При установке сохраняет на телефоне всё нужное: страницу, скрипты, точки, граф пеших дорог
-   и все картинки карты (≈ 3,5 МБ). Дальше:
+   Установка быстрая: сразу сохраняется только само приложение (страница, скрипты, точки — десятки КБ),
+   оно открывается без интернета уже со второго запуска. Граф пеших дорог (≈ 2,6 МБ) и картинки карты (≈ 3,5 МБ)
+   докачиваются в фоне — по сообщению «cache-map» от страницы, уже скачанное повторно не качается. Дальше:
      - картинки карты — сразу из сохранённого (они не меняются, пока не пересобрана карта);
      - точки и контакты (js/points.js, js/config.js) — сначала из сети (ждём до 3 секунд), без сети — сохранённые:
        новую точку, добавленную в админке, видно с первого же открытия;
      - остальное — сразу из сохранённого, а в фоне обновляется из сети.
-   Поменяли файлы приложения или граф (tools/build_routes.py) — увеличьте VERSION.
+   Поменяли файлы приложения — увеличьте VERSION; пересобрали граф (tools/build_routes.py) — DATA_VERSION.
    Пересобрали карту (tools/build_map.py) — увеличьте TILES_VERSION (картинки карты скачаются заново, ≈ 4 МБ).
    ================================================================ */
 self.window = self;                  // js/map-data.js пишет в window, а здесь его нет
 importScripts("../js/map-data.js"); // FASTCUP_MAP: уровни и размеры картинок карты
 
-var VERSION = "5";
+var VERSION = "6";
 var TILES_VERSION = "4";   // отдельно от VERSION: смена скриптов не заставляет телефон заново качать карту
+var DATA_VERSION = "1";    // граф пеших дорог: увеличьте после tools/build_routes.py
 var CORE = "fastcup-app-" + VERSION;
 var TILES = "fastcup-tiles-" + TILES_VERSION;
+var DATA = "fastcup-data-" + DATA_VERSION;
 var FILES = [
-  "./", "index.html", "app.css", "app.js", "route-worker.js", "manifest.webmanifest", "data/walk-graph.bin",
+  "./", "index.html", "app.css", "app.js", "route-worker.js", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-180.png",
   "../js/config.js", "../js/points.js", "../js/map-data.js", "../js/omap.js", "../css/omap.css",
   "../images/web/logo-word-light.png", "../images/web/favicon.png"
@@ -34,14 +37,18 @@ function tileUrls() {
   return out;
 }
 
-/* скачать список по несколько файлов за раз; ошибки отдельных картинок не мешают установке */
+var BIG = ["data/walk-graph.bin"];   // большое, но нужно без интернета — в фоне, после установки
+
+/* скачать список по несколько файлов за раз; уже сохранённые пропускаем, ошибки отдельных файлов не мешают */
 function fetchAll(cache, urls, parallel) {
   var i = 0;
   function next() {
     if (i >= urls.length) return Promise.resolve();
     var url = urls[i++];
-    return fetch(url).then(function (res) { if (res.ok) return cache.put(url, res); })
-      .catch(function () {}).then(next);
+    return cache.match(url).then(function (hit) {
+      if (hit) return;
+      return fetch(url).then(function (res) { if (res.ok) return cache.put(url, res); });
+    }).catch(function () {}).then(next);
   }
   var workers = [];
   for (var k = 0; k < parallel; k++) workers.push(next());
@@ -49,18 +56,26 @@ function fetchAll(cache, urls, parallel) {
 }
 
 self.addEventListener("install", function (e) {
-  e.waitUntil(
-    caches.open(CORE).then(function (c) { return c.addAll(FILES); })
+  e.waitUntil(caches.open(CORE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
+});
+
+/* докачка в фоне: граф дорог и картинки карты (страница присылает «cache-map» при каждом запуске — недостающее докачается) */
+var caching = null;
+self.addEventListener("message", function (e) {
+  if (!e.data || e.data.type !== "cache-map") return;
+  if (!caching) {
+    caching = caches.open(DATA).then(function (c) { return fetchAll(c, BIG, 1); })
       .then(function () { return caches.open(TILES); })
-      .then(function (c) { return fetchAll(c, tileUrls(), 6); })
-      .then(function () { return self.skipWaiting(); })
-  );
+      .then(function (c) { return fetchAll(c, tileUrls(), 4); })
+      .then(function () { caching = null; }, function () { caching = null; });
+  }
+  e.waitUntil(caching);
 });
 
 self.addEventListener("activate", function (e) {
   e.waitUntil(
     caches.keys().then(function (keys) {
-      return Promise.all(keys.filter(function (k) { return k.indexOf("fastcup-") === 0 && k !== CORE && k !== TILES; })
+      return Promise.all(keys.filter(function (k) { return k.indexOf("fastcup-") === 0 && k !== CORE && k !== TILES && k !== DATA; })
         .map(function (k) { return caches.delete(k); }));
     }).then(function () { return self.clients.claim(); })
   );
@@ -70,10 +85,11 @@ self.addEventListener("fetch", function (e) {
   var req = e.request;
   if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
 
-  if (req.url.indexOf("/images/web/map/") !== -1) {         // картинки карты: сначала сохранённые
-    e.respondWith(caches.match(req).then(function (hit) {
+  var big = req.url.indexOf("/data/walk-graph.bin") !== -1;
+  if (req.url.indexOf("/images/web/map/") !== -1 || big) {   // картинки карты и граф дорог: сначала сохранённые
+    e.respondWith(caches.match(req, { ignoreSearch: true }).then(function (hit) {
       return hit || fetch(req).then(function (res) {
-        if (res.ok) { var copy = res.clone(); caches.open(TILES).then(function (c) { c.put(req, copy); }); }
+        if (res.ok) { var copy = res.clone(); caches.open(big ? DATA : TILES).then(function (c) { c.put(req, copy); }); }
         return res;
       });
     }));

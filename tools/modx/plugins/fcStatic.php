@@ -9,7 +9,7 @@
  */
 switch ($modx->event->name) {
     case 'OnLoadWebDocument':
-        $keys = ['fc_phone', 'fc_phone_raw', 'fc_telegram_url', 'fc_max_url', 'fc_email', 'fc_map_center'];
+        $keys = ['fc_phone', 'fc_phone_raw', 'fc_telegram_url', 'fc_max_url', 'fc_email', 'fc_map_center', 'fc_price_200', 'fc_price_300', 'fc_promos', 'fc_open_now'];
         $sign = md5(implode('|', array_map(function ($k) use ($modx) { return (string)$modx->getOption($k); }, $keys)));
         if ($modx->cacheManager->get('fc_config_sign') === $sign) break;
         $modx->runSnippet('fcWriteStatic', ['what' => 'config']);

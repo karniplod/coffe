@@ -1,17 +1,29 @@
 {
+  "id": "./",
   "name": "Fastcup — кофе рядом",
   "short_name": "Fastcup",
   "description": "Ближайший кофейный автомат Fastcup в Перми и пеший маршрут до него. Работает без интернета.",
   "lang": "ru",
+  "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1E120E",
   "theme_color": "#1E120E",
+  "categories": ["food", "navigation", "lifestyle"],
+  "prefer_related_applications": false,
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ближайший кофе", "short_name": "Ближайший", "description": "Маршрут до ближайшего автомата Fastcup", "url": "./?from=shortcut",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ],
+  "screenshots": [
+    { "src": "icons/screen-route.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Маршрут пешком до ближайшего автомата" },
+    { "src": "icons/screen-list.jpg", "sizes": "780x1688", "type": "image/jpeg", "form_factor": "narrow", "label": "Все точки Fastcup по расстоянию" }
   ]
 }

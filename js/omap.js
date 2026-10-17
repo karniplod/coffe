@@ -245,11 +245,16 @@
     }
 
     // ---- управление ----
-    /* Перетаскивание: мышкой; на телефоне — одним пальцем в приложении, двумя на сайте */
-    var drag = null, justDragged = false;
+    /* Перетаскивание: мышкой; на телефоне — одним пальцем в приложении, двумя на сайте.
+       Отпустили на ходу — карта ещё немного едет и плавно тормозит (инерция), как в картах на телефоне. */
+    var drag = null, justDragged = false, glide = 0, lastPointer = "mouse";
+    var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function stopGlide() { if (glide) { cancelAnimationFrame(glide); glide = 0; settle(); } }
     el.addEventListener("pointerdown", function (e) {
+      lastPointer = e.pointerType;
       if ((e.pointerType === "touch" && !opts.oneFinger) || e.button !== 0 || e.target.closest(".omap__zoom, .omap__attr")) return;
-      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, px: posX, py: posY, moved: false };
+      stopGlide();   // коснулись едущей карты — останавливаем, как в картах
+      drag = { id: e.pointerId, x: e.clientX, y: e.clientY, px: posX, py: posY, moved: false, track: [] };
     });
     el.addEventListener("pointermove", function (e) {
       if (!drag || e.pointerId !== drag.id) return;
@@ -264,22 +269,59 @@
         moved();
       }
       posX = drag.px + dx; posY = drag.py + dy;
+      var now = performance.now();   // последние ~100 мс движения — по ним скорость для инерции
+      drag.track.push([now, e.clientX, e.clientY]);
+      while (drag.track.length > 2 && now - drag.track[0][0] > 100) drag.track.shift();
       update();
     });
     function stop() {
-      if (drag && drag.moved) { justDragged = true; setTimeout(function () { justDragged = false; }, 0); settle(); }
+      var d = drag;
       drag = null;
       el.classList.remove("is-dragging");
+      if (!d || !d.moved) return;
+      justDragged = true; setTimeout(function () { justDragged = false; }, 0);
+      var t = d.track, vx = 0, vy = 0;
+      if (t.length >= 2 && performance.now() - t[t.length - 1][0] < 60) {   // палец не замер перед отпусканием
+        var a = t[0], b = t[t.length - 1], dt = Math.max(8, b[0] - a[0]);
+        vx = (b[1] - a[1]) / dt; vy = (b[2] - a[2]) / dt;                   // пикселей за миллисекунду
+      }
+      if (reduceMotion || Math.hypot(vx, vy) < 0.3) { settle(); return; }
+      var last = performance.now();
+      function step(now) {
+        var ms = Math.min(32, now - last); last = now;
+        posX += vx * ms; posY += vy * ms;
+        var k = Math.pow(0.996, ms);   // торможение: за 0,3 с скорость падает втрое
+        vx *= k; vy *= k;
+        clampView();
+        render();
+        if (Math.hypot(vx, vy) > 0.02) glide = requestAnimationFrame(step); else { glide = 0; settle(); }
+      }
+      glide = requestAnimationFrame(step);
     }
     el.addEventListener("pointerup", stop);
     el.addEventListener("pointercancel", stop);
+    /* Нажатие на карту. В приложении (одним пальцем) двойной тап приближает к месту тапа — как в картах на телефоне;
+       поэтому одиночное нажатие отдаём приложению с паузой 0,3 с: вдруг это первый тап двойного */
+    var tapTimer = 0, lastTap = null;
     el.addEventListener("click", function (e) {
       // отпускание кнопки над меткой после перетаскивания не должно её выбирать
       if (justDragged) { e.stopPropagation(); e.preventDefault(); return; }
-      if (opts.onTap && !e.target.closest(".omap__zoom, .omap__attr, .omap__pin, .is-draggable, button, a")) {
-        var r = el.getBoundingClientRect();
-        opts.onTap(fromXY((e.clientX - r.left - posX) / scale, (e.clientY - r.top - posY) / scale));
+      if (e.target.closest(".omap__zoom, .omap__attr, .omap__pin, .is-draggable, button, a")) return;
+      var r = el.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      var c = fromXY((x - posX) / scale, (y - posY) / scale);
+      if (lastPointer === "touch" && opts.oneFinger) {
+        var now = Date.now();
+        if (tapTimer && now - lastTap.t < 300 && Math.hypot(x - lastTap.x, y - lastTap.y) < 40) {
+          clearTimeout(tapTimer); tapTimer = 0;
+          zoomAt(scale * 2, x, y, true);
+          return;
+        }
+        lastTap = { t: now, x: x, y: y };
+        clearTimeout(tapTimer);
+        tapTimer = setTimeout(function () { tapTimer = 0; if (opts.onTap) opts.onTap(c); }, 300);
+        return;
       }
+      if (opts.onTap) opts.onTap(c);
     }, true);
 
     /* Два пальца: двигаем и масштабируем; на сайте одним пальцем листается страница */
@@ -292,9 +334,11 @@
     el.addEventListener("touchstart", function (e) {
       if (e.touches.length !== 2) return;
       cancelAnimationFrame(anim);
+      stopGlide();
       drag = null; // второй палец превращает перетаскивание в масштабирование
       pinch = touchInfo(e);
       pinch.s = scale; pinch.px = posX; pinch.py = posY;
+      pinch.t0 = Date.now(); pinch.shift = 0;   // для «тапа двумя пальцами»: коротко и почти без движения
       el.classList.add("is-dragging");
       hint.classList.remove("is-visible");
       moved();
@@ -310,6 +354,7 @@
       if (e.touches.length !== 2 || !pinch) return;
       e.preventDefault();
       var t = touchInfo(e);
+      pinch.shift = Math.max(pinch.shift, Math.abs(t.d - pinch.d), Math.hypot(t.x - pinch.x, t.y - pinch.y));
       var s = Math.min(MAX_SCALE, Math.max(pinch.s * t.d / pinch.d, minScale()));
       posX = t.x - (pinch.x - pinch.px) * s / pinch.s;
       posY = t.y - (pinch.y - pinch.py) * s / pinch.s;
@@ -317,7 +362,14 @@
       update();
     }, { passive: false });
     el.addEventListener("touchend", function (e) {
-      if (e.touches.length < 2 && pinch) { pinch = null; el.classList.remove("is-dragging"); settle(); }
+      if (e.touches.length < 2 && pinch) {
+        var p = pinch;
+        pinch = null;
+        el.classList.remove("is-dragging");
+        settle();
+        // тап двумя пальцами — отдалить (как в картах на телефоне)
+        if (Date.now() - p.t0 < 300 && p.shift < 12) { moved(); zoomAt(scale / 2, p.x, p.y, true); }
+      }
     });
 
     /* Колесо мыши (только в приложении: на сайте оно листает страницу) */
@@ -338,6 +390,7 @@
 
     /* Двойной щелчок по карте — приблизить к этому месту */
     el.addEventListener("dblclick", function (e) {
+      if (lastPointer === "touch") return;   // на телефоне двойной тап обрабатывается выше
       if (e.target.closest(".omap__zoom, .omap__attr, .omap__pin, .is-draggable, button, a")) return;
       var r = el.getBoundingClientRect();
       zoomAt(scale * 2, e.clientX - r.left, e.clientY - r.top, true);

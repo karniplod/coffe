@@ -428,7 +428,7 @@ try {
             $sys = $modx->getObject(modSystemSetting::class, $s['key']);
             if ($sys && (string)$sys->get('value') !== '') $value = (string)$sys->get('value');
             $o = $modx->newObject('cgSetting');
-            $o->fromArray(['key' => $s['key'], 'label' => $s['name'], 'description' => $s['help'], 'xtype' => 'textfield',
+            $o->fromArray(['key' => $s['key'], 'label' => $s['name'], 'description' => $s['help'], 'xtype' => $s['xtype'] ?? 'textfield',
                            'value' => $value, 'default' => '', 'group' => $ccIds[$grp], 'sortorder' => $ccSort[$grp]]);
             if (saved($o, "поле ClientConfig {$s['key']}")) say('new', "ClientConfig «{$grp}»: {$s['name']} = «{$value}»");
         } catch (Throwable $e) { say('error', "ClientConfig {$s['key']}: " . $e->getMessage()); }
@@ -437,7 +437,7 @@ try {
         if ($inCc($s)) continue;
         if ($modx->getObject(modSystemSetting::class, $s['key'])) { say('skip', "настройка {$s['key']} уже есть — не трогаю"); continue; }
         $o = $modx->newObject(modSystemSetting::class);
-        $o->fromArray(['key' => $s['key'], 'value' => $s['value'], 'xtype' => 'textfield', 'namespace' => 'core', 'area' => 'Fastcup'], '', true);
+        $o->fromArray(['key' => $s['key'], 'value' => $s['value'], 'xtype' => ($s['xtype'] ?? '') === 'xcheckbox' ? 'combo-boolean' : 'textfield', 'namespace' => 'core', 'area' => 'Fastcup'], '', true);
         if (saved($o, "настройку {$s['key']}")) say('new', "настройка {$s['key']} = «{$s['value']}»");
         $modx->setOption($s['key'], $s['value']);
     }
@@ -543,7 +543,11 @@ try {
 
     // --- 14. js/points.js и js/config.js из админки
     if ($dry) say('upd', 'js/points.js и js/config.js — соберу из страниц «Точки» и настроек');
-    elseif ($snippetExists('fcWriteStatic')) say('upd', 'файлы карты: ' . $modx->runSnippet('fcWriteStatic', ['what' => 'all']));
+    elseif ($snippetExists('fcWriteStatic')) {
+        // сниппет только что обновлён, а MODX исполнил бы старую копию из кэша скриптов — сначала чистим её
+        try { $modx->cacheManager->refresh(['scripts' => []]); } catch (Throwable $e) {}
+        say('upd', 'файлы карты: ' . $modx->runSnippet('fcWriteStatic', ['what' => 'all']));
+    }
 } catch (Throwable $e) {
     say('error', 'установка прервана: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . '). Уже сделанное сохранено, резервная копия — ' . str_replace(MODX_CORE_PATH, 'core/', $backupDir));
 }

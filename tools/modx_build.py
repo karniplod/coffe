@@ -79,6 +79,7 @@ def cfg(key):
 
 CONTACTS = {k: cfg(k) for k in ("phone", "phoneHref", "telegram", "max", "email")}
 CENTER = one(r"mapCenter:\s*\[([^\]]+)\]", cfg_js, "js/config.js: mapCenter").group(1).strip()
+FEATURES = {k: v == "true" for k, v in re.findall(r"(promos|openNow):\s*(true|false)", cfg_js)}
 
 head = one(r"<head>\n(.*?)\n</head>", page, "<head>").group(1)
 body = one(r"<body[^>]*>\n(.*?)\n</body>", page, "<body>").group(1)
@@ -289,6 +290,13 @@ TVS = [
     {"name": "fc_point_coords", "caption": "Координаты", "type": "text", "templates": ["fc-point"], "category": "Поля",
      "description": "«широта, долгота», например «58.0119, 56.2452». В Яндекс Картах: правый клик по месту → «Что здесь?» → скопировать числа",
      "elements": "", "default": ""},
+    {"name": "fc_point_promo", "caption": "Акция в этой точке", "type": "text", "templates": ["fc-point"], "category": "Поля",
+     "description": "Необязательно. Видна в приложении, если включены акции («Конфигурация» → «Приложение»). Например «Капучино 300 мл за 120 ₽ до 11:00»",
+     "elements": "", "default": ""},
+    {"name": "fc_point_price_200", "caption": "Цена 200 мл здесь, ₽", "type": "text", "templates": ["fc-point"], "category": "Поля",
+     "description": "Необязательно: только если в этой точке цена не как везде. Только число", "elements": "", "default": ""},
+    {"name": "fc_point_price_300", "caption": "Цена 300 мл здесь, ₽", "type": "text", "templates": ["fc-point"], "category": "Поля",
+     "description": "Необязательно: только если в этой точке цена не как везде. Только число", "elements": "", "default": ""},
 ]
 SETTINGS = [
     {"key": "fc_phone", "value": CONTACTS["phone"], "name": "Телефон", "cc": "Контакты", "help": "Как показывать на сайте: +7 (966) 790-12-46"},
@@ -300,6 +308,10 @@ SETTINGS = [
     {"key": "fc_price_200", "value": PRICE200, "name": "Цена 200 мл, ₽", "cc": "Цены и карта", "help": "Только число: 100"},
     {"key": "fc_price_300", "value": PRICE300, "name": "Цена 300 мл, ₽", "cc": "Цены и карта", "help": "Только число: 150"},
     {"key": "fc_map_center", "value": CENTER, "name": "Центр карты", "cc": "Цены и карта", "help": "«широта, долгота» — если точек нет: 58.0105, 56.2294"},
+    {"key": "fc_promos", "value": "1" if FEATURES.get("promos") else "0", "name": "Акции и цены точек в приложении", "cc": "Приложение", "xtype": "xcheckbox",
+     "help": "Значок «%» на метке, акция и цена в карточке, фильтры «Только с акциями» и «Сначала дешевле». Акции — в поле точки «Акция в этой точке»"},
+    {"key": "fc_open_now", "value": "1" if FEATURES.get("openNow") else "0", "name": "«Открыто / Закрыто» в приложении", "cc": "Приложение", "xtype": "xcheckbox",
+     "help": "По часам работы точки: «Круглосуточно» или «07:00–23:00»"},
     {"key": "fc_menu_id", "value": "", "name": "ID раздела «Меню»", "cc": "", "help": "Заполняет установщик"},
     {"key": "fc_points_id", "value": "", "name": "ID раздела «Точки»", "cc": "", "help": "Заполняет установщик"},
     {"key": "fc_policy_id", "value": "", "name": "ID страницы политики", "cc": "", "help": "Заполняет установщик"},
@@ -346,7 +358,8 @@ manifest = {
     "top": "Fastcup", "email": CONTACTS["email"],
     "chunks": chunk_list, "templates": templates, "snippets": snippets, "plugins": plugins, "tvs": TVS, "settings": SETTINGS,
     "cc_groups": {"Контакты": "Телефон, почта, MAX и Telegram — на сайте, в форме и в приложении",
-                  "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты"},
+                  "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты",
+                  "Приложение": "Дополнительные возможности приложения /app/ — по умолчанию выключены"},
     "managed_files": ["js/points.js", "js/config.js"],   # их пересоздаёт MODX: из архива — только если на сервере их ещё нет
     "id_settings": {"fc_menu_id": "menu", "fc_points_id": "tochki", "fc_policy_id": "politika"},
 }
