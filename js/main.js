@@ -214,11 +214,20 @@
   });
 
 
+  /* Свободная часть карты [сверху, справа, снизу, слева] — карта ставит точки в её середину.
+     Видимая часть — между шапкой и панелью с текстом. Метка рисуется над своей точкой (≈ 55 px вверх),
+     поэтому сверху отступ больше на высоту метки: тогда в центре оказывается сама метка, а не её острие. */
+  var PIN_H = 56;
   function panelMargin() {
-    var panel = document.querySelector(".hero__panel");
-    if (window.innerWidth <= 960) return [100, 90, 70, 45];  // панель под картой (см. @media 960px в style.css)
+    var panel = document.querySelector(".hero__panel"), bar = document.querySelector(".topbar");
+    var map = mapEl.getBoundingClientRect(), p = panel.getBoundingClientRect();
+    var top = Math.max(0, bar.getBoundingClientRect().bottom - map.top) + PIN_H;
+    if (window.innerWidth <= 960) {  // панель под картой и заходит на неё снизу (см. @media 960px в style.css)
+      var bottom = Math.max(10, map.bottom - p.top + 2);
+      return [top, 64, bottom, 64];   // справа — кнопки масштаба; слева столько же, чтобы точка была по центру
+    }
     var cupRight = window.innerWidth > 1080 ? 300 : 90;     // справа место под карточку стаканчика (если видна) и кнопки масштаба
-    return [110, cupRight, 90, panel.getBoundingClientRect().right + 40];
+    return [top, cupRight, 10, p.right - map.left + 40];
   }
 
   function initMap() {
