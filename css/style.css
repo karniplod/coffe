@@ -224,20 +224,8 @@ p { margin: 0; }
 .nbtn--go:hover { background: var(--sunset); transform: translateY(-1px); }
 .nbtn__ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 /* ссылка на приложение (app/): маршрут прямо на нашей карте, работает без интернета */
-/* вход в приложение — заметная кнопка с пояснением */
-.app-cta {
-  display: flex; align-items: center; gap: 12px; max-width: 440px; margin-top: 10px; padding: 12px 16px;
-  border-radius: var(--radius-sm); text-decoration: none; color: var(--foam);
-  background: rgba(246,166,90,.14); box-shadow: inset 0 0 0 1.5px rgba(246,166,90,.7);
-  transition: background-color .2s, transform .2s;
-}
-.app-cta:hover { background: rgba(246,166,90,.24); transform: translateY(-1px); }
-.app-cta__ico { flex: none; width: 34px; height: 34px; padding: 6px; border-radius: 10px; background: var(--sunset); fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.app-cta__text { display: grid; gap: 2px; }
-.app-cta__text b { font-size: 15px; }
-.app-cta__text small { font-size: 12.5px; line-height: 1.35; color: rgba(255,246,236,.75); }
-.app-cta__arrow { margin-left: auto; font-size: 20px; color: var(--apricot); transition: transform .2s; }
-.app-cta:hover .app-cta__arrow { transform: translateX(3px); }
+/* под кнопками карточки: чем полезно приложение */
+.nearest__hint { max-width: 440px; margin-top: 8px; font-size: 12.5px; line-height: 1.4; color: rgba(255,246,236,.7); }
 
 /* подсказка жестов на карте — один раз, при первом заходе */
 .map-hint {
@@ -553,6 +541,11 @@ p { margin: 0; }
 .ck__l { min-height: 44px; padding: 0 6px; border: 0; background: none; cursor: pointer; font: 600 14px/1.2 var(--sans); color: var(--apricot); text-decoration: underline; text-underline-offset: 3px; }
 html.ck-on .totop { bottom: calc(var(--ck-h, 0px) + 36px); }   /* «Наверх» над баннером */
 @media (max-width: 720px) {
+  /* кнопки карточки ближайшей точки — компактнее, чтобы две помещались в строку */
+  .nearest__actions { gap: 6px; }
+  .nbtn { min-height: 38px; padding: 7px 11px; font-size: 13px; gap: 5px; }
+  .nbtn--go { padding: 7px 13px; }
+  .nbtn__ico { width: 16px; height: 16px; }
   .ck { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: auto; }
   .ck__in { padding: 16px 16px 14px; }
   .ck__x { font-size: 13.5px; }
