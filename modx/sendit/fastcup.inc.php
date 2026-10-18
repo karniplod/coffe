@@ -4,9 +4,14 @@
  * и прописывает его в системной настройке si_path_to_presets.
  *
  * Стандартные пресеты SendIt (защита от спама в 'default') подключаются из sendit.inc.php, наш — 'fastcup'.
- * Почту для заявок меняйте в настройке fc_email и запустите установщик ещё раз — он перепишет адрес здесь.
+ * Почта для заявок берётся из настройки fc_email («Конфигурация» → «Контакты») в момент отправки — поменяли там, и заявки идут на новую.
+ * Адрес ниже (%%EMAIL_TO%% при установке) — запасной, если настройку не прочитать.
  * Параметры FormIt: https://docs.modx.com/3.x/en/extras/formit · SendIt: https://docs.modx.pro/components/sendit/
  */
+// почта для заявок — из ClientConfig / системной настройки fc_email прямо сейчас, а не та, что была при установке
+$mx = $GLOBALS['modx'] ?? null;
+$emailTo = ($mx && trim((string)$mx->getOption('fc_email'))) ? trim((string)$mx->getOption('fc_email')) : '%%EMAIL_TO%%';
+
 $base = [];
 $std = __DIR__ . '/sendit.inc.php';
 if (is_file($std)) $base = (array)include $std;
@@ -15,7 +20,7 @@ return array_merge($base, [
     'fastcup' => [
         'extends'      => 'default',                     // защита от спама из стандартного пресета SendIt
         'hooks'        => 'FormItSaveForm,email',        // сначала сохранить заявку («Приложения → FormIt»), потом письмо: не ушло письмо — заявка не потеряется
-        'emailTo'      => '%%EMAIL_TO%%',
+        'emailTo'      => $emailTo,
         'emailFrom'    => '%%EMAIL_FROM%%',              // ящик на домене сайта, иначе письма уходят в спам
         'emailFromName'=> 'Сайт Fastcup',
         'emailSubject' => 'Заявка с сайта Fastcup',

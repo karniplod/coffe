@@ -314,7 +314,7 @@ SETTINGS = [
     {"key": "fc_phone", "value": CONTACTS["phone"], "name": "Телефон", "cc": "Контакты", "help": "Как показывать на сайте: +7 (966) 790-12-46"},
     {"key": "fc_phone_raw", "value": CONTACTS["phoneHref"], "name": "Телефон для ссылки", "cc": "Контакты", "help": "Только + и цифры: +79667901246"},
     {"key": "fc_email", "value": CONTACTS["email"], "name": "Почта", "cc": "Контакты",
-     "help": "Показывается на сайте. Сменили — запустите установщик ещё раз, чтобы заявки шли на новую почту"},
+     "help": "Показывается на сайте, на неё же приходят заявки с формы (сразу после сохранения)"},
     {"key": "fc_max_url", "value": CONTACTS["max"], "name": "Ссылка на MAX", "cc": "Контакты", "help": "Полная ссылка https://max.ru/…"},
     {"key": "fc_telegram_url", "value": CONTACTS["telegram"], "name": "Ссылка на Telegram", "cc": "Контакты", "help": "Полная ссылка https://t.me/…"},
     {"key": "fc_price_200", "value": PRICE200, "name": "Цена 200 мл, ₽", "cc": "Цены и карта", "help": "Только число: 100"},
