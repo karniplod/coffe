@@ -138,6 +138,7 @@
 
   var count = POINTS.length;
   var nearestNext = document.getElementById("nearestNext");
+  var nearestBack = document.getElementById("nearestBack");
   var me = null;          // координаты посетителя, если он разрешил геолокацию
   var order = POINTS.map(function (_, i) { return i; }); // порядок точек: ближайшие первыми
   var selected = -1;      // какая точка выбрана сейчас
@@ -162,6 +163,7 @@
     nearestRoute.href = routeUrl(me, p.coords);
     nearestRoute.hidden = false;
     nearestNext.hidden = count < 2;
+    nearestBack.hidden = !me || isNearest;   // выбрана не ближайшая — можно вернуться к ближайшей
     pins.forEach(function (b, k) { b.firstChild.classList.toggle("is-selected", k === i); });
     // показать посетителя и точку вместе; без геолокации — просто подвинуть карту к точке
     if (omap && pan) omap.fit(me ? [me, p.coords] : [p.coords], !me, true);
@@ -170,6 +172,7 @@
     var pos = order.indexOf(selected);
     selectPoint(order[(pos + 1) % order.length], true);
   });
+  nearestBack.addEventListener("click", function () { selectPoint(order[0], true); });
 
 
   /* Свободная часть карты [сверху, справа, снизу, слева] — карта ставит точки в её середину.

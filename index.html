@@ -162,8 +162,10 @@
         <div class="nearest__body">
           <p class="nearest__label" id="nearestLabel">Ищем ближайший автомат…</p>
           <div class="nearest__actions">
-            <a class="nearest__route" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden>Маршрут пешком</a>
-            <button class="nearest__next" id="nearestNext" type="button" hidden>Другая точка</button>
+            <!-- как в приложении: «Идти» — пешая навигация в Яндекс Картах, «Другая точка», «← Ближайшая» -->
+            <a class="nbtn nbtn--go" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden><svg class="nbtn__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 4a1.5 1.5 0 1 0 0 .01M10 21l2-6 3 3v3M9 12l2-4 3 1 2 3M11 8l-3 2-1 3"/></svg>Идти</a>
+            <button class="nbtn" id="nearestNext" type="button" hidden>Другая точка</button>
+            <button class="nbtn" id="nearestBack" type="button" hidden>← Ближайшая</button>
           </div>
         </div>
       </div>

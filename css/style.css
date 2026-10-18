@@ -209,11 +209,20 @@ p { margin: 0; }
 .nearest__dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--apricot); box-shadow: 0 0 0 0 rgba(246,166,90,.7); animation: ping 2s infinite; }
 .nearest__label { font-size: 15px; line-height: 1.4; }
 .nearest__label b { font-weight: 600; }
-.nearest__actions { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; }
+.nearest__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .nearest__actions:empty, .nearest__actions:not(:has(:not([hidden]))) { display: none; }
-.nearest__route, .nearest__next { font: 600 14px/1.3 var(--sans); color: var(--apricot); text-underline-offset: 4px; }
-.nearest__next { background: none; border: 0; padding: 0; cursor: pointer; color: rgba(255,246,236,.8); text-decoration: underline; text-decoration-style: dotted; }
-.nearest__next:hover { color: #fff; }
+/* кнопки как в приложении: «Идти» — главная, остальные — прозрачные */
+.nbtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 16px;
+  border: 0; border-radius: 999px; cursor: pointer; text-decoration: none; font: 600 14px/1.2 var(--sans);
+  color: var(--foam); background: rgba(255,246,236,.1); box-shadow: inset 0 0 0 1.5px rgba(255,246,236,.45);
+  transition: background-color .2s, transform .2s;
+}
+.nbtn:hover { background: rgba(255,246,236,.2); }
+.nbtn[hidden] { display: none; }
+.nbtn--go { color: #fff; background: var(--sunset); box-shadow: 0 8px 20px -10px rgba(201,80,90,.8); padding: 8px 20px; }
+.nbtn--go:hover { background: var(--sunset); transform: translateY(-1px); }
+.nbtn__ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 /* ссылка на приложение (app/): маршрут прямо на нашей карте, работает без интернета */
 /* вход в приложение — заметная кнопка с пояснением */
 .app-cta {
@@ -237,7 +246,7 @@ p { margin: 0; }
   background: rgba(30,18,14,.88); box-shadow: 0 10px 30px -14px rgba(30,18,14,.7); cursor: pointer;
 }
 .map-hint[hidden] { display: none; }
-@media (min-width: 961px) { .map-hint { left: calc(50% + 200px); } }   /* на компьютере — между панелью с текстом и карточкой со стаканом */
+@media (min-width: 961px) { .map-hint { top: 104px; bottom: auto; left: calc(50% + 180px); } }   /* на компьютере — под шапкой, правее текста, не над карточкой со стаканом и кнопками */
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(246,166,90,.7); } 70% { box-shadow: 0 0 0 12px rgba(246,166,90,0); } 100% { box-shadow: 0 0 0 0 rgba(246,166,90,0); } }
 
 .hero__cup {
