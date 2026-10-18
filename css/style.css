@@ -191,7 +191,7 @@ p { margin: 0; }
 .hero__panel { position: relative; z-index: 2; width: min(560px, 100%); }
 .hero__title {
   font-family: var(--hand); font-weight: 700;
-  font-size: clamp(56px, 6.6vw, 100px); line-height: .92;
+  font-size: clamp(42px, min(4.4vw, 8.5vh), 76px); line-height: .95;   /* и по высоте экрана: на ноутбуках первый экран невысокий */
   text-wrap: balance;
   text-shadow: 0 2px 30px rgba(30,18,14,.5);
 }
@@ -237,7 +237,7 @@ p { margin: 0; }
   background: rgba(30,18,14,.88); box-shadow: 0 10px 30px -14px rgba(30,18,14,.7); cursor: pointer;
 }
 .map-hint[hidden] { display: none; }
-@media (min-width: 961px) { .map-hint { left: calc(50% + 160px); } }   /* на компьютере — между панелью с текстом и карточкой со стаканом */
+@media (min-width: 961px) { .map-hint { left: calc(50% + 200px); } }   /* на компьютере — между панелью с текстом и карточкой со стаканом */
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(246,166,90,.7); } 70% { box-shadow: 0 0 0 12px rgba(246,166,90,0); } 100% { box-shadow: 0 0 0 0 rgba(246,166,90,0); } }
 
 .hero__cup {
