@@ -187,7 +187,9 @@
     if (fit) collapse(false);   // выбрали точку — показываем карточку целиком
     var p = POINTS[r.i];
     card.hidden = !listEl.hidden;   // открыт список точек — карточку не показываем поверх
-    $("kicker").textContent = r.i === results[0].i ? "Ближайший кофе" : "Ещё одна точка";
+    var nearest = r.i === results[0].i;
+    $("kicker").textContent = nearest ? "Ближайший кофе" : "Ещё одна точка";
+    $("nearestBtn").hidden = nearest;
     $("title").textContent = p.title;
     $("addr").textContent = p.address + (p.hours ? " · " + p.hours : "");
     $("dist").textContent = fmtDist(r.meters);
@@ -201,7 +203,7 @@
     $("promo").textContent = p.promo || "";
     $("price").hidden = !(FEAT.promos && priceText(p));
     $("price").textContent = FEAT.promos ? priceText(p) : "";
-    $("ext").href = "https://yandex.ru/maps/?rtext=" + me.join(",") + "~" + p.coords.join(",") + "&rtt=pd";
+    $("go").href = "https://yandex.ru/maps/?rtext=" + me.join(",") + "~" + p.coords.join(",") + "&rtt=pd";   // пешком, от вас до точки
     listBtn.hidden = POINTS.length < 2;
     if (!listEl.hidden) renderList();
     omap.setRoute(r.points || [omap.toXY(me), omap.toXY(p.coords)]);
@@ -214,7 +216,10 @@
     omap.fit(pts, false, true);
   }
 
-  $("show").addEventListener("click", function () { var r = find(sel); if (r) fitRoute(r); });
+  function toRoute() { var r = find(sel); if (r) fitRoute(r); }
+  $("show").addEventListener("click", toRoute);
+  $("title").addEventListener("click", toRoute);
+  $("nearestBtn").addEventListener("click", function () { if (!results) return; sel = results[0].i; chosenAt = null; show(true); });
   $("next").addEventListener("click", function () {
     if (!results) return;
     var k = results.indexOf(find(sel));
@@ -465,12 +470,34 @@
     } else tip.hidden = false;
   }
   window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; installBtn.hidden = false; offerLater(); });
-  window.addEventListener("appinstalled", function () { installBtn.hidden = true; tip.hidden = true; installCard.hidden = true; standalone = true; });
+  window.addEventListener("appinstalled", function () {
+    installBtn.hidden = true; tip.hidden = true; installCard.hidden = true; standalone = true;
+    // установили — просим телефон не удалять сохранённую карту при нехватке места
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+  });
   if (ios && !standalone) { installBtn.hidden = false; offerLater(); }
   installBtn.addEventListener("click", install);
   $("installNow").addEventListener("click", install);
   $("installLater").addEventListener("click", function () { installCard.hidden = true; store.set("fc-install-later", "1"); });
   $("tipClose").addEventListener("click", function () { tip.hidden = true; });
+
+  /* Подсказка жестов — один раз: исчезает при первом касании карты или через 8 секунд */
+  var hint = $("hint");
+  if (!store.get("fc-app-hint")) {
+    hint.hidden = false;
+    store.set("fc-app-hint", "1");   // показали — больше не показываем, даже если не закрыли
+    var hideHint = function () { hint.hidden = true; };
+    $("map").addEventListener("pointerdown", hideHint, { once: true });
+    hint.addEventListener("click", hideHint);
+    setTimeout(hideHint, 8000);
+  }
+
+  /* Нет интернета — показываем, что всё нужное работает и без него */
+  var offlineEl = $("offline");
+  function netState() { offlineEl.hidden = navigator.onLine !== false; }
+  window.addEventListener("online", netState);
+  window.addEventListener("offline", netState);
+  netState();
 
   // iPhone: щипок по шапке или карточке увеличивал бы всю страницу — в приложении масштабируется только карта
   document.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });

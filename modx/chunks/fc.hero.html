@@ -18,10 +18,16 @@
           <div class="nearest__actions">
             <a class="nearest__route" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden>Маршрут пешком</a>
             <button class="nearest__next" id="nearestNext" type="button" hidden>Другая точка</button>
-            <a class="nearest__app" href="/app/">Маршрут в приложении</a>
           </div>
         </div>
       </div>
+
+      <!-- вход в приложение: заметной кнопкой с пояснением, а не мелкой ссылкой -->
+      <a class="app-cta" href="/app/">
+        <svg class="app-cta__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3M12 7.5c-1.7 0-3 1.3-3 3 0 2.2 3 5 3 5s3-2.8 3-5c0-1.7-1.3-3-3-3z"/></svg>
+        <span class="app-cta__text"><b>Открыть в приложении</b><small>Маршрут пешком до ближайшего · работает без интернета · можно установить на телефон</small></span>
+        <span class="app-cta__arrow" aria-hidden="true">→</span>
+      </a>
 
       <div class="hero__actions">
         <a class="btn btn--sunset" href="#b2b" data-topic="Обслуживание">Обслуживание и ремонт</a>

@@ -38,24 +38,32 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg>
   </button>
 
+  <!-- нет интернета: карта и маршруты всё равно работают — так и пишем -->
+  <p class="offline" id="offline" hidden>Нет интернета — карта и маршруты работают</p>
+  <!-- подсказка жестов: один раз, при первом открытии -->
+  <p class="hint" id="hint" hidden>Палец — двигать · два пальца — масштаб · метка — адрес</p>
+
   <section class="sheet" id="sheet" aria-live="polite">
     <!-- «ручка»: свернуть/развернуть панель (сворачивается и сама, когда двигаете карту) -->
     <button class="sheet__handle" id="handle" type="button" aria-label="Свернуть панель" aria-expanded="true"><span></span></button>
     <p class="sheet__status" id="status">Загружаем карту…</p>
     <div class="sheet__card" id="card" hidden>
-      <p class="sheet__kicker"><span id="kicker">Ближайший кофе</span><span class="badge" id="open" hidden></span></p>
-      <h1 class="sheet__title" id="title"></h1>
+      <p class="sheet__kicker"><span id="kicker">Ближайший кофе</span><span class="badge" id="open" hidden></span>
+        <button class="chip chip--back" id="nearestBtn" type="button" hidden>← Ближайшая</button></p>
+      <!-- тап по названию — снова показать маршрут целиком (если карту отодвинули) -->
+      <h1 class="sheet__title"><button class="sheet__titlebtn" id="title" type="button" title="Показать маршрут на карте"></button></h1>
       <p class="sheet__addr" id="addr"></p>
       <p class="sheet__promo" id="promo" hidden></p>
       <p class="sheet__eta"><b id="dist"></b><span id="time"></span></p>
       <p class="sheet__price" id="price" hidden></p>
       <div class="sheet__actions">
-        <button class="btn btn--sunset" id="show" type="button">Показать маршрут</button>
+        <!-- «Идти» — пешая навигация с голосом в Яндекс Картах (маршрут здесь строится сам) -->
+        <a class="btn btn--sunset" id="go" href="#" target="_blank" rel="noopener"><svg class="btn__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 4a1.5 1.5 0 1 0 0 .01M10 21l2-6 3 3v3M9 12l2-4 3 1 2 3M11 8l-3 2-1 3"/></svg>Идти</a>
         <button class="btn btn--ghost" id="next" type="button">Другая точка</button>
       </div>
       <div class="sheet__links">
         <button class="link" id="listBtn" type="button" hidden>Все точки</button>
-        <a class="link" id="ext" href="#" target="_blank" rel="noopener">Открыть в Яндекс Картах</a>
+        <button class="link" id="show" type="button">Показать маршрут</button>
       </div>
     </div>
     <!-- все точки по расстоянию: открывается кнопкой «Все точки» -->

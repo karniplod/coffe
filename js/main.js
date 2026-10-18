@@ -191,6 +191,20 @@
 
   function initMap() {
     omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .08 });   // .08 — можно отдалить, чтобы далёкие точки поместились целиком
+    // подсказка, как пользоваться картой — один раз: исчезает при первом касании карты или через 9 секунд
+    var seen = false;
+    try { seen = !!localStorage.getItem("fc-map-hint"); } catch (e) {}
+    if (!seen) {
+      var mh = document.createElement("p");
+      mh.className = "map-hint";
+      mh.textContent = isTouch ? "Палец — двигать · два пальца — масштаб · метка — адрес"
+                               : "Тяните карту мышью · двойной щелчок — ближе · метка — адрес";
+      mapEl.appendChild(mh);
+      try { localStorage.setItem("fc-map-hint", "1"); } catch (e) {}   // показали — больше не показываем
+      var hideMh = function () { mh.hidden = true; };
+      mapEl.addEventListener("pointerdown", hideMh, { once: true });
+      setTimeout(hideMh, 9000);
+    }
     // iPhone: щипок по карте масштабирует карту, а не всю страницу
     mapEl.addEventListener("gesturestart", function (e) { e.preventDefault(); }, { passive: false });
     // кнопка «Все точки» под «+» и «−»: вернуть карту к виду со всеми автоматами

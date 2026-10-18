@@ -180,3 +180,22 @@ html, body { touch-action: none; }
 .sheet.is-collapsed .sheet__title { font-size: 18px; }
 .sheet.is-collapsed .sheet__eta { margin-top: 2px; font-size: 14px; }
 .sheet.is-collapsed .sheet__eta b { font-size: 18px; }
+
+/* ---------- карточка: «Идти», «← Ближайшая», название — кнопка «к маршруту» ---------- */
+a.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn__ico { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.chip--back { min-height: 30px; padding: 5px 12px; margin-left: auto; font-size: 12px; text-transform: none; letter-spacing: 0; }
+.chip--back[hidden] { display: none; }
+.sheet__titlebtn { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.sheet__titlebtn:hover { text-decoration: underline; text-decoration-color: rgba(255,246,236,.4); text-underline-offset: 4px; }
+.link { min-height: 44px; display: inline-flex; align-items: center; }   /* палец попадает уверенно */
+
+/* ---------- заметка «нет интернета» и подсказка жестов ---------- */
+.offline, .hint {
+  position: fixed; z-index: 5; left: 50%; transform: translateX(-50%); margin: 0; max-width: calc(100% - 24px);
+  padding: 10px 16px; border-radius: 14px; font-size: 14px; line-height: 1.35; text-align: center;
+  box-shadow: 0 10px 30px -14px rgba(30,18,14,.7);
+}
+.offline { top: calc(var(--safe-t) + 74px); color: var(--ink); background: var(--apricot); font-weight: 600; }
+.hint { bottom: calc(var(--sheet-h, 170px) + 76px); width: max-content;   /* выше кнопки «где я» */ color: var(--foam); background: rgba(30,18,14,.88); cursor: pointer; }
+.offline[hidden], .hint[hidden] { display: none; }
