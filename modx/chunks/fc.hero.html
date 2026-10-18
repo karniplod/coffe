@@ -16,10 +16,10 @@
         <div class="nearest__body">
           <p class="nearest__label" id="nearestLabel">Ищем ближайший автомат…</p>
           <div class="nearest__actions">
-            <!-- как в приложении: «Яндекс Карты» — пешая навигация, «Другая точка», «В приложении», «← Ближайшая» -->
-            <a class="nbtn nbtn--go" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden><svg class="nbtn__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>Яндекс Карты</a>
+            <!-- главная — «В приложении» (маршрут на карте, без интернета); «Яндекс Карты» — пешая навигация; «Другая точка»; «← Ближайшая» -->
+            <a class="nbtn nbtn--go" href="/app/"><svg class="nbtn__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>В приложении</a>
+            <a class="nbtn" id="nearestRoute" href="#" target="_blank" rel="noopener" hidden><svg class="nbtn__ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>Яндекс Карты</a>
             <button class="nbtn" id="nearestNext" type="button" hidden>Другая точка</button>
-            <a class="nbtn" href="/app/"><svg class="nbtn__ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/></svg>В приложении</a>
             <button class="nbtn" id="nearestBack" type="button" hidden>← Ближайшая</button>
           </div>
         </div>
