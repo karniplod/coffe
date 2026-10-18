@@ -84,6 +84,7 @@ if (!is_file(MODX_CORE_PATH . 'vendor/autoload.php')) stop('Не найден co
 require_once MODX_CORE_PATH . 'vendor/autoload.php';
 if (!class_exists('MODX\Revolution\modX')) stop('Нет класса MODX\Revolution\modX. Установщик рассчитан на MODX 3.');
 
+use xPDO\xPDO;
 use MODX\Revolution\modX;
 use MODX\Revolution\modCategory;
 use MODX\Revolution\modChunk;
@@ -472,6 +473,8 @@ try {
         if (saved($o, "настройку {$s['key']}")) say('new', "настройка {$s['key']} = «{$s['value']}»");
         $modx->setOption($s['key'], $s['value']);
     }
+    // ClientConfig держит свой кэш значений: без сброса новые поля не видны на сайте, пока не очистить кэш вручную
+    if ($cc && !$dry) { try { $modx->cacheManager->delete('system_settings', [xPDO::OPT_CACHE_KEY => 'clientconfig']); } catch (Throwable $e) {} }
     // значения из ClientConfig — сразу в этот запуск (их ждут сниппеты ниже)
     if ($cc && !$dry) foreach ($modx->getIterator('cgSetting') as $o) $modx->setOption($o->get('key'), $o->get('value'));
 
@@ -660,6 +663,15 @@ function selfCheck() {
         say($bad ? 'error' : 'ok', "$label (/$path)" . ($bad ? ': ' . implode(', ', $bad) : ''));
     };
     $page('', 'главная', ['class="hero', 'application/ld+json']);
+    // контакты из «Конфигурации» (ClientConfig) действительно выводятся на сайте
+    [, , $home] = httpGet($base);
+    foreach (['fc_phone' => 'телефон', 'fc_email' => 'почта'] as $k => $label) {
+        $v = trim((string)$modx->getOption($k));
+        if ($v === '') continue;
+        $shown = strpos($home, htmlspecialchars($v)) !== false || strpos($home, $v) !== false;
+        say($shown ? 'ok' : 'error', $shown ? "на сайте выводится $label из «Конфигурации»: $v"
+            : "на сайте не выводится $label из «Конфигурации» ($v) — очистите кэш (Управление → Очистить кэш) и проверьте, что ключ поля в ClientConfig ровно «{$k}»");
+    }
     $page('politika', 'политика обработки персональных данных', ['ИНН']);
     $page('soglasie', 'согласие на обработку персональных данных', ['ИНН']);
     $page('cookie', 'политика cookie');
