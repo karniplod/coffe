@@ -90,6 +90,7 @@ use MODX\Revolution\modPlugin;
 use MODX\Revolution\modPluginEvent;
 use MODX\Revolution\modResource;
 use MODX\Revolution\modDocument;
+use MODX\Revolution\modWebLink;
 use MODX\Revolution\modContentType;
 use MODX\Revolution\Transport\modTransportProvider;
 use MODX\Revolution\Transport\modTransportPackage;
@@ -518,12 +519,13 @@ try {
                 continue;
             }
             if (!$isNew) backup('resources', $r['alias'], $o->toArray() + ['tvs' => array_map(function ($n) use ($o) { return $o->getTVValue($n); }, array_combine(array_keys($r['tvs']), array_keys($r['tvs'])))]);
-            if ($isNew) $o = $modx->newObject(modDocument::class);
+            $cls = ($r['class'] ?? '') === 'weblink' ? modWebLink::class : modDocument::class;   // weblink — короткий адрес-перенаправление
+            if ($isNew) $o = $modx->newObject($cls);
             $data = $r['fields'] + [
                 'parent' => $parentId, 'template' => $r['template'] ? (int)($tplIds[$r['template']] ?? 0) : 0,
                 'published' => $r['published'] ?? 1, 'hidemenu' => $r['hidemenu'] ?? 0, 'searchable' => $r['searchable'] ?? 1,
                 'isfolder' => $r['isfolder'] ?? 0, 'menuindex' => $menu[$parentId], 'context_key' => 'web',
-                'richtext' => $r['richtext'] ?? 0, 'class_key' => modDocument::class, 'cacheable' => 1,
+                'richtext' => $r['richtext'] ?? 0, 'class_key' => $cls, 'cacheable' => 1,
             ];
             if (!$home || $isNew) $data['alias'] = $r['alias'];
             if ($isNew && $data['published']) $data['publishedon'] = time();

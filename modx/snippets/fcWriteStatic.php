@@ -1,6 +1,6 @@
 <?php
 /**
- * fcWriteStatic — пересоздаёт js/points.js и js/config.js в корне сайта из админки MODX.
+ * fcWriteStatic — пересоздаёт assets/js/points.js и assets/js/config.js из админки MODX (все файлы сайта — в assets/).
  * Эти файлы читают карта на сайте и приложение /app/ (оно работает без интернета, поэтому данные — в файлах, а не в странице).
  *
  * &what=`all` | `points` | `config`. Пишет файл, только если содержимое изменилось. Возвращает, что сделано.
@@ -12,7 +12,7 @@
 use MODX\Revolution\modResource;
 
 $what = $modx->getOption('what', $scriptProperties, 'all');
-$dir = MODX_BASE_PATH . 'js/';
+$dir = MODX_BASE_PATH . 'assets/js/';
 $done = [];
 $js = function ($v) { return json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); };
 $coords = function ($s) {
@@ -57,6 +57,7 @@ if ($what === 'all' || $what === 'config') {
     $on = function ($k) use ($modx) { return in_array(strtolower(trim((string)$modx->getOption($k, null, '0'))), ['1', 'true', 'yes', 'on'], true); };
     $write('config.js', "/* Настройки сайта Fastcup. Файл создаёт MODX из настроек (ClientConfig → «Контакты») — правьте там, а не здесь. */\n"
         . "window.FASTCUP_CONFIG = {\n"
+        . "  assetsBase: \"/assets/\",   // файлы сайта (картинки карты) — в assets/\n"
         . "  mapCenter: [" . $center[0] . ", " . $center[1] . "],\n"
         . "  phone: " . $o('fc_phone') . ",\n"
         . "  phoneHref: " . $o('fc_phone_raw') . ",\n"

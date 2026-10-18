@@ -127,8 +127,8 @@ PRICE200, PRICE300 = "100", "150"
 
 
 def absolutize(s):
-    """Пути к файлам — от корня сайта: страницы MODX бывают не в корне (/politika), относительные пути сломаются."""
-    s = re.sub(r'((?:src|href|srcset|poster)=")(?:\./)?(images|css|js|app)/', r"\1/\2/", s)
+    """Пути к файлам — от корня сайта и в папку assets/ (там в MODX лежат все файлы сайта); страницы бывают не в корне (/politika)."""
+    s = re.sub(r'((?:src|href|srcset|poster)=")(?:\./)?(images|css|js|app|fonts)/', r"\1/assets/\2/", s)
     return s
 
 
@@ -209,16 +209,19 @@ CHUNKS["fc.scripts"] = common(one(r"</footer>\n\n(.*)", body, "скрипты п
 ld = one(r'(  <script type="application/ld\+json">.*?</script>)', head, "JSON-LD").group(1)
 h = head.replace(ld + "\n", "").replace(ld, "")
 h = re.sub(r"  <!-- SEO: замените https://example.ru[^\n]*-->\n", "", h)
-h = re.sub(r"<title>.*?</title>", "<title>[[*longtitle:default=`[[*pagetitle]]`]]</title>", h)
+h = re.sub(r"<title>.*?</title>", "<title>[[*longtitle:default=`[[*pagetitle]]`:htmlent]]</title>", h)
+# код подтверждения Яндекс Вебмастера — из «Конфигурации» → «Аналитика»: вписали — метка появилась
+h = must_replace(h, '  <!-- Подтверждение прав в Яндекс Вебмастере: вставьте свой код -->\n  <!-- <meta name="yandex-verification" content="ВАШ_КОД"> -->',
+                 '  [[++fc_yandex_verification:notempty=`<meta name="yandex-verification" content="[[++fc_yandex_verification]]">`]]', "yandex-verification")
 h = re.sub(r'<meta name="description" content="[^"]*">', '<meta name="description" content="[[*description:htmlent]]">', h)
 h = re.sub(r'<link rel="canonical" href="[^"]*">', '<link rel="canonical" href="[[~[[*id]]? &scheme=`full`]]">', h)
 h = re.sub(r'<meta property="og:title" content="[^"]*">', '<meta property="og:title" content="[[*longtitle:default=`[[*pagetitle]]`:htmlent]]">', h)
 h = re.sub(r'<meta property="og:description" content="[^"]*">', '<meta property="og:description" content="[[*introtext:default=`[[*description]]`:htmlent]]">', h)
 h = re.sub(r'<meta property="og:url" content="[^"]*">', '<meta property="og:url" content="[[~[[*id]]? &scheme=`full`]]">', h)
-h = h.replace("https://example.ru/", "[[++site_url]]")
+h = h.replace("https://example.ru/images/", "[[++site_url]]assets/images/").replace("https://example.ru/", "[[++site_url]]")
 CHUNKS["fc.head"] = common(h)
 
-ld = ld.replace("https://example.ru/", "[[++site_url]]")
+ld = ld.replace("https://example.ru/images/", "[[++site_url]]assets/images/").replace("https://example.ru/", "[[++site_url]]")
 ld = must_replace(ld, '"legalName": "%s"' % LEGAL["fc_legal_name"], '"legalName": "[[++fc_legal_name]]"', "legalName")
 ld = must_replace(ld, '"taxID": "%s"' % LEGAL["fc_inn"], '"taxID": "[[++fc_inn]]"', "taxID")
 ld = ld.replace('"telephone": "%s"' % CONTACTS["phoneHref"], '"telephone": "[[++fc_phone_raw]]"')
@@ -327,6 +330,8 @@ SETTINGS = [
      "help": "Указывается в политике и согласии"},
     {"key": "fc_ym_id", "value": "", "name": "Номер счётчика Яндекс Метрики", "cc": "Аналитика",
      "help": "Только цифры. Пусто — Метрика не подключается. Счётчик грузится только после согласия посетителя на аналитические cookie"},
+    {"key": "fc_yandex_verification", "value": "", "name": "Код подтверждения Яндекс Вебмастера", "cc": "Аналитика",
+     "help": "Только код из метатега, который выдаёт Вебмастер (content=\"…\"). Пусто — метки нет"},
     {"key": "fc_cookie_ver", "value": "2026-10-18", "name": "Версия политики cookie", "cc": "Аналитика",
      "help": "Дата. Поменяли состав cookie (например, подключили Метрику) — поменяйте дату: баннер снова спросит согласие"},
     {"key": "fc_map_center", "value": CENTER, "name": "Центр карты", "cc": "Цены и карта", "help": "«широта, долгота» — если точек нет: 58.0105, 56.2294"},
@@ -366,6 +371,12 @@ for a_, (t_, d_) in build_legal.PAGES.items():   # документы: поли�
                            "content": io.open(os.path.join(SRC, "content", a_ + ".html"), encoding="utf-8").read().strip()},
                 "tvs": {}})
 RES += [{
+    # короткий адрес приложения для рекламы и визиток: ваш-домен/app → само приложение в assets/app/
+    "alias": "app", "parent": "", "template": "", "class": "weblink", "hidemenu": 1, "searchable": 0, "always": True,
+    "fields": {"pagetitle": "Приложение (короткий адрес /app)", "content": "/assets/app/",
+               "description": "Перенаправляет на приложение Fastcup. Не удаляйте: адрес /app может быть на визитках и в рекламе"},
+    "tvs": {},
+}, {
     "alias": "robots", "parent": "", "template": "", "hidemenu": 1, "searchable": 0, "always": True, "content_type": "text/plain",
     "fields": {"pagetitle": "robots.txt", "content": "User-agent: *\nAllow: /\nDisallow: /manager/\nDisallow: /fastcup-modx/\n\nSitemap: [[++site_url]]sitemap.xml"},
     "tvs": {},
@@ -385,7 +396,7 @@ manifest = {
                   "Реквизиты": "Оператор персональных данных для подвала, политики и согласия (домашний адрес не публикуется)",
                   "Аналитика": "Яндекс Метрика и баннер cookie",
                   "Приложение": "Дополнительные возможности приложения /app/ — по умолчанию выключены"},
-    "managed_files": ["js/points.js", "js/config.js"],   # их пересоздаёт MODX: из архива — только если на сервере их ещё нет
+    "managed_files": ["assets/js/points.js", "assets/js/config.js"],   # их пересоздаёт MODX: из архива — только если на сервере их ещё нет
     "id_settings": {"fc_menu_id": "menu", "fc_points_id": "tochki", "fc_policy_id": "politika", "fc_agree_id": "soglasie", "fc_cookie_id": "cookie"},
 }
 tpl = io.open(os.path.join(SRC, "fc-install.inc.php.tpl"), encoding="utf-8").read()
@@ -396,6 +407,12 @@ shutil.copy(os.path.join(SRC, "htaccess.txt"), os.path.join(OUT, ".htaccess"))  
 
 # ---------------------------------------------------------------- архив: пакет + файлы сайта
 SITE = ["css", "js", "app", "fonts", os.path.join("images", "web")]
+# Приложение лежит в assets/app/: относительные пути ../js, ../images остаются верными, а ссылки на страницы сайта — от корня
+SITE_FIX = {
+    "app/index.html": [('href="../politika"', 'href="/politika"'), ('href="../cookie"', 'href="/cookie"'),
+                       ('<a class="bar__brand" href="../"', '<a class="bar__brand" href="/"')],
+    "js/config.js": [('assetsBase: ""', 'assetsBase: "/assets/"')],
+}
 os.makedirs(DIST, exist_ok=True)
 zpath = os.path.join(DIST, PKG + ".zip")
 n_site = 0
@@ -410,7 +427,17 @@ with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
                 continue
             for f in files:
                 full = os.path.join(base, f)
-                z.write(full, PKG + "/site/" + os.path.relpath(full, ROOT).replace("\\", "/"))
+                rel = os.path.relpath(full, ROOT).replace("\\", "/")
+                arc = PKG + "/site/assets/" + rel   # в MODX все файлы сайта — в assets/
+                if rel in SITE_FIX:   # файлы, где в MODX нужны другие адреса
+                    text = io.open(full, encoding="utf-8").read()
+                    for a_, b_ in SITE_FIX[rel]:
+                        if a_ not in text:
+                            sys.exit("%s: не нашёл «%s» — поправьте SITE_FIX в tools/modx_build.py" % (rel, a_))
+                        text = text.replace(a_, b_)
+                    z.writestr(arc, text)
+                else:
+                    z.write(full, arc)
                 n_site += 1
 
 print("Пакет MODX: modx/ — чанков %d, шаблонов %d, сниппетов %d, плагинов %d, полей %d, страниц %d (напитков %d, точек %d, вопросов %d)"

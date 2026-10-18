@@ -23,4 +23,5 @@ foreach ($modx->getIterator(modResource::class, $q) as $r) {
     if ($offers) $item['offers'] = $offers;
     $out[] = json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
-return implode(",\n              ", $out);
+// пробел после «{»: если в MODX включат Fenom (pdotools_fenom_parser), он не примет JSON за свой тег
+return str_replace('{"', '{ "', implode(",\n              ", $out));

@@ -357,6 +357,21 @@
   "tvs": {}
  },
  {
+  "alias": "app",
+  "parent": "",
+  "template": "",
+  "class": "weblink",
+  "hidemenu": 1,
+  "searchable": 0,
+  "always": true,
+  "fields": {
+   "pagetitle": "Приложение (короткий адрес /app)",
+   "content": "/assets/app/",
+   "description": "Перенаправляет на приложение Fastcup. Не удаляйте: адрес /app может быть на визитках и в рекламе"
+  },
+  "tvs": {}
+ },
+ {
   "alias": "robots",
   "parent": "",
   "template": "",

@@ -24,7 +24,7 @@ if ($mode === 'ld') {
         $out[] = json_encode(['@type' => 'Question', 'name' => $q, 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $a]],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
-    return implode(",\n          ", $out);
+    return str_replace('{"', '{ "', implode(",\n          ", $out));   // пробел после «{» — совместимость с Fenom
 }
 
 $html = '';

@@ -197,7 +197,7 @@
   }
 
   function initMap() {
-    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .08 });   // .08 — можно отдалить, чтобы далёкие точки поместились целиком
+    omap = FastcupMap(mapEl, { data: window.FASTCUP_MAP, base: CFG.assetsBase || "", oneFinger: true, margin: panelMargin, onError: mapFallback, maxScale: 6, maxFitScale: 2, minFitScale: .08 });   // .08 — можно отдалить, чтобы далёкие точки поместились целиком
     // подсказка, как пользоваться картой — один раз: исчезает при первом касании карты или через 9 секунд
     var seen = false;
     try { seen = !!localStorage.getItem("fc-map-hint"); } catch (e) {}
@@ -422,8 +422,19 @@
      ========================================================= */
   var form = document.getElementById("leadForm");
   var status = document.getElementById("formStatus");
+  var siBtn = form.querySelector("button[type=submit]"), siLabel = siBtn.textContent, siTimer = 0;
+  function siDone() { delete form.dataset.busy; siBtn.disabled = false; siBtn.textContent = siLabel; clearTimeout(siTimer); }
+  document.addEventListener("si:send:finish", siDone);   // SendIt ответил (принял или вернул ошибки) — кнопка снова работает
   form.addEventListener("submit", function (e) {
-    if (form.hasAttribute("data-si-form")) return;  // сайт на MODX: форму отправляет SendIt (modx/), он же проверяет поля
+    if (form.hasAttribute("data-si-form")) {  // сайт на MODX: форму отправляет SendIt (modx/), он же проверяет поля
+      // SendIt перед отправкой решает задачу защиты от ботов (до 10 с на слабом телефоне). Второе нажатие за это время
+      // ушло бы второй заявкой и получило «Проверка не пройдена» — поэтому, пока идёт отправка, кнопка не работает
+      if (form.dataset.busy) { e.preventDefault(); e.stopPropagation(); return; }
+      form.dataset.busy = "1";
+      siBtn.disabled = true; siBtn.textContent = "Отправляем…";
+      clearTimeout(siTimer); siTimer = setTimeout(siDone, 40000);   // на случай, если ответ так и не пришёл
+      return;
+    }
     e.preventDefault();
     var el = form.elements;
     var name = el["name"].value.trim(), phone = el["phone"].value.trim();
