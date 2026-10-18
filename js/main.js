@@ -69,34 +69,14 @@
   var spyTargets = [{ a: brand, el: document.querySelector(".hero") }].concat(navLinks.map(function (a) {
     return { a: a, el: document.getElementById(a.dataset.spy) };
   })).filter(function (t) { return t.a && t.el; });
-  /* Шапка: прилипает и поджимается при прокрутке, а цвет — инверсия блока под ней (data-tone в разметке) */
+  /* Шапка: прилипает и поджимается при прокрутке */
   var topbar = document.querySelector(".topbar");
-  var mnavEl = document.getElementById("mnav");
-  var toneEls = Array.prototype.slice.call(document.querySelectorAll("[data-tone]"));
-  var themeMeta = document.querySelector('meta[name="theme-color"]');
-  var THEME = { light: "#1E120E", dark: "#FFF6EC", accent: "#EF8458" }; // цвет строки браузера на телефоне
-  var barTone = "", barCompact = null, barMid = 0;
-  // середина шапки по высоте — меряем заранее, а не на каждом кадре (чтение размеров после правки стилей тормозит)
-  function measureBar() { if (topbar) { var r = topbar.getBoundingClientRect(); barMid = r.top + r.height / 2; } }
+  var barCompact = null;
+  // шапка всегда одного цвета (тёмная): при прокрутке внимание на блоках, а не на смене её цвета; меняется только высота
   function updateBar(y) {
     if (!topbar) return;
-    // сначала только читаем размеры блоков, потом меняем шапку — и только если что-то изменилось
-    var mid = barMid, tone = "light";
-    for (var i = 0; i < toneEls.length; i++) {
-      var b = toneEls[i].getBoundingClientRect();
-      if (b.top <= mid && b.bottom > mid) {
-        var t = toneEls[i].dataset.tone;
-        // панель первого экрана тёмная только на телефоне; на компьютере она прозрачная поверх карты
-        if (t === "panel") { if (window.innerWidth <= 960) tone = "dark"; } else tone = t;
-      }
-    }
     var compact = y > 40;
     if (compact !== barCompact) { barCompact = compact; topbar.classList.toggle("is-compact", compact); }
-    if (tone === barTone) return;
-    barTone = tone;
-    topbar.dataset.over = tone;
-    if (mnavEl) mnavEl.dataset.over = tone;
-    if (themeMeta) themeMeta.setAttribute("content", THEME[tone] || THEME.light);
   }
 
   var totop = document.querySelector(".totop");
@@ -117,40 +97,18 @@
       totop.classList.toggle("is-visible", y > vh * 0.8);
       var max = document.documentElement.scrollHeight - vh;
       ring.style.strokeDashoffset = String(157.08 * (1 - Math.min(1, y / (max || 1))));
-      // подсказка: куда отправит стрелка
-      var prev = currentSection() - 1, label = prev >= 1 ? "К разделу «" + spyTargets[prev].a.textContent + "»" : "Наверх";
-      if (totop.getAttribute("aria-label") !== label) { totop.setAttribute("aria-label", label); totop.title = label; }
     }
   }
 
-  /* Какой раздел меню сейчас на экране (номер в spyTargets, 0 — первый экран).
-     Внизу страницы последний раздел может не доехать до верха — тогда считаем его, если он виден. */
-  function currentSection() {
-    var vh = window.innerHeight, cur = -1;
-    var atBottom = window.scrollY + vh >= document.documentElement.scrollHeight - 2;
-    spyTargets.forEach(function (t, k) {
-      var top = t.el.getBoundingClientRect().top;
-      if (top <= vh * 0.4 || (atBottom && top < vh * 0.9)) cur = k;
-    });
-    return cur;
-  }
-
-  /* Стрелка «наверх»: каждое нажатие — плавно к предыдущему пункту меню, выше пунктов нет — в самый верх */
-  var stepTarget = -1, stepTime = 0;
+  /* Стрелка «наверх» — сразу в самый верх */
   if (totop) totop.addEventListener("click", function (e) {
     e.preventDefault();
-    // нажали ещё раз, пока страница едет, — отступаем от цели прошлого нажатия, а не от текущего места
-    var cur = Date.now() - stepTime < 900 ? stepTarget : currentSection();
-    var k = cur - 1, how = reduceMotion ? "auto" : "smooth";
-    stepTime = Date.now();
-    if (k < 1) { stepTarget = 0; window.scrollTo({ top: 0, behavior: how }); }
-    else { stepTarget = k; spyTargets[k].el.scrollIntoView({ behavior: how, block: "start" }); }
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
   window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
-  window.addEventListener("resize", function () { measureBar(); restPill(); onScroll(); });
+  window.addEventListener("resize", function () { restPill(); onScroll(); });
   // шапка поджалась или расправилась — у пунктов другие отступы, «пилюлю» и середину шапки меряем заново
-  if (topbar) topbar.addEventListener("transitionend", function (e) { if (e.target === topbar && e.propertyName === "padding-left") { measureBar(); restPill(); } });
-  measureBar();
+  if (topbar) topbar.addEventListener("transitionend", function (e) { if (e.target === topbar && e.propertyName === "padding-left") restPill(); });
   onScroll();
 
   /* =========================================================

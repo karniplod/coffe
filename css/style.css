@@ -67,9 +67,8 @@ p { margin: 0; }
 
 /* ---------- шапка ----------
    Всегда плавающая капсула (форма не меняется); при прокрутке (.is-compact) поднимается ближе к краю и получает тень.
-   Цвет — инверсия блока под ней (js/main.js ставит data-over по data-tone блока):
-   над светлым — тёмное стекло, над тёмным и над оранжевым «Меню» — кремовое.
-   Все цвета шапки и мобильного меню — переменные ниже, смена тона перетекает плавно. */
+   Цвет всегда один — тёмное стекло: при прокрутке внимание на блоках, а не на шапке.
+   Цвета шапки и мобильного меню — переменные ниже. */
 .topbar, .mnav {
   --bar-bg: rgba(30, 18, 14, .88);
   --bar-fg: var(--foam);
@@ -79,26 +78,6 @@ p { margin: 0; }
   --bar-line: rgba(255, 246, 236, .1);
   --bar-shadow: 0 14px 34px -18px rgba(0, 0, 0, .55);
   --logo-light: 1;
-}
-.topbar[data-over="dark"], .mnav[data-over="dark"] {
-  --bar-bg: rgba(255, 246, 236, .92);
-  --bar-fg: var(--ink);
-  --bar-muted: rgba(42, 26, 20, .7);
-  --bar-chip: rgba(42, 26, 20, .07);
-  --bar-chip-hover: rgba(42, 26, 20, .13);
-  --bar-line: rgba(255, 246, 236, .6);
-  --bar-shadow: 0 16px 36px -18px rgba(0, 0, 0, .6);
-  --logo-light: 0;
-}
-.topbar[data-over="accent"], .mnav[data-over="accent"] {
-  --bar-bg: rgba(255, 246, 236, .93);
-  --bar-fg: var(--ink);
-  --bar-muted: rgba(91, 42, 61, .78);
-  --bar-chip: rgba(201, 80, 90, .1);
-  --bar-chip-hover: rgba(201, 80, 90, .18);
-  --bar-line: rgba(255, 255, 255, .7);
-  --bar-shadow: 0 16px 36px -16px rgba(107, 46, 71, .55);
-  --logo-light: 0;
 }
 .topbar {
   --bar-ease: cubic-bezier(.2, .8, .2, 1);
@@ -119,15 +98,9 @@ p { margin: 0; }
   transition: opacity .4s ease; will-change: opacity;
 }
 .topbar::before { background: rgba(30, 18, 14, .88); box-shadow: 0 14px 34px -18px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 246, 236, .1); }
-.topbar::after { background: rgba(255, 246, 236, .92); box-shadow: 0 16px 36px -18px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(255, 246, 236, .6); opacity: 0; }
-.topbar[data-over="dark"]::before, .topbar[data-over="accent"]::before { opacity: 0; }
-.topbar[data-over="dark"]::after, .topbar[data-over="accent"]::after { opacity: 1; }
-.topbar[data-over="accent"]::after { background: rgba(255, 246, 236, .95); box-shadow: 0 16px 36px -16px rgba(107, 46, 71, .55), inset 0 0 0 1px rgba(255, 255, 255, .7); }
 /* прокрутили: капсула поднимается ближе к краю, чуть ниже ростом и с тенью заметнее — форма та же */
 .topbar.is-compact { top: 8px; padding: 8px 10px 8px 12px; }
 .topbar.is-compact::before { box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 246, 236, .1); }
-.topbar.is-compact::after { box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 246, 236, .6); }
-.topbar.is-compact[data-over="accent"]::after { box-shadow: 0 18px 40px -14px rgba(107, 46, 71, .6), inset 0 0 0 1px rgba(255, 255, 255, .7); }
 .topbar__side { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .topbar__side--left { justify-content: flex-end; }
 .topbar__side--right { justify-content: flex-start; }
