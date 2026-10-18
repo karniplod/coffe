@@ -64,6 +64,9 @@ if ($what === 'all' || $what === 'config') {
         . "  max: " . $o('fc_max_url') . ",\n"
         . "  email: " . $o('fc_email') . ",\n"
         . "  formEndpoint: \"\",   // заявки отправляет SendIt (пресет fastcup)\n"
+        . "  legal: { name: " . $o('fc_legal_name') . ", inn: " . $o('fc_inn') . ", ogrnip: " . $o('fc_ogrnip') . ", pdEmail: " . $o('fc_pd_email') . " },\n"
+        . "  metrikaId: " . $o('fc_ym_id') . ",\n"
+        . "  cookieVersion: " . $o('fc_cookie_ver') . ",\n"
         . "  prices: { \"200\": " . (int)$modx->getOption('fc_price_200', null, 100) . ", \"300\": " . (int)$modx->getOption('fc_price_300', null, 150) . " },\n"
         . "  features: { promos: " . ($on('fc_promos') ? 'true' : 'false') . ", openNow: " . ($on('fc_open_now') ? 'true' : 'false') . " }\n"
         . "};\n");

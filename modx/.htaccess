@@ -1,0 +1,15 @@
+# Папка установщика закрыта от браузера: открыт только fc-install.php (тексты, настройки формы и файлы сайта по прямой ссылке не открыть).
+# Кладётся в папку установщика как .htaccess. После установки папку удалите — кнопкой в конце отчёта.
+<IfModule mod_authz_core.c>
+  Require all denied
+  <Files "fc-install.php">
+    Require all granted
+  </Files>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order deny,allow
+  Deny from all
+  <Files "fc-install.php">
+    Allow from all
+  </Files>
+</IfModule>

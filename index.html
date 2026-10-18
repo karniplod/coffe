@@ -24,9 +24,10 @@
   <meta property="og:image" content="https://example.ru/images/web/banner-cup.jpg">
   <link rel="icon" href="images/web/favicon.png">
   <link rel="apple-touch-icon" href="images/web/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
+  <!-- шрифты — с самого сайта (fonts/), без запросов к Google -->
+  <link rel="preload" href="fonts/caveat-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/omap.css">
   <link rel="stylesheet" href="css/style.css">
 
@@ -38,6 +39,8 @@
         "@type": "Organization",
         "@id": "https://example.ru/#org",
         "name": "Fastcup",
+        "legalName": "Индивидуальный предприниматель Нелюбин Максим Николаевич",
+        "taxID": "590303416168",
         "url": "https://example.ru/",
         "logo": "https://example.ru/images/web/logo-full-dark.png",
         "description": "Сеть кофейных автоматов самообслуживания в Перми. Собственное производство аппаратов, установка автоматов у партнёров, обслуживание и ремонт, продажа ингредиентов.",
@@ -517,9 +520,10 @@
           <label for="f-msg">Комментарий <span class="opt">необязательно</span></label>
           <textarea id="f-msg" name="message" rows="3"></textarea>
         </div>
+        <label class="agree"><input type="checkbox" name="agree" value="1" required> <span>Даю <a href="soglasie.html" target="_blank">согласие на обработку персональных данных</a> и принимаю <a href="politika.html" target="_blank">политику обработки данных</a></span></label>
+        <p class="form__err" data-si-error="agree" aria-live="polite"></p>
         <button class="btn btn--sunset" type="submit">Отправить заявку</button>
         <p class="form__status" id="formStatus" role="status"></p>
-        <p class="form__legal">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>
       </form>
     </div>
   </section>
@@ -529,10 +533,18 @@
 <footer class="footer" data-tone="dark">
   <img src="images/web/logo-full-light.png" alt="Fastcup — кофе с собой" width="200" height="90" loading="lazy">
   <p>Fastcup — сеть кофейных автоматов самообслуживания в Перми. Кофе с собой от 100 ₽, установка кофейных автоматов, обслуживание и ремонт, ингредиенты оптом.</p>
+  <nav class="footer__docs" aria-label="Документы">
+    <a href="politika.html">Политика обработки персональных данных</a>
+    <a href="soglasie.html">Согласие на обработку персональных данных</a>
+    <a href="cookie.html">Политика cookie</a>
+    <button type="button" data-cookie-settings>Настройки cookie</button>
+  </nav>
+  <p class="footer__req js-legal">ИП Нелюбин Максим Николаевич · ИНН 590303416168 · ОГРНИП 326595800080130</p>
   <p class="footer__copy">© <span id="year">2026</span> Fastcup</p>
 </footer>
 
 <script src="js/config.js"></script>
+<script src="js/cookies.js" defer data-fc-cookies data-policy="cookie.html"></script>
 <script src="js/points.js"></script>
 <script src="js/map-data.js"></script>
 <script src="js/omap.js"></script>

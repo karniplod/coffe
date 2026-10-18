@@ -134,6 +134,8 @@ html, body { touch-action: none; }
 .chip { min-height: 36px; padding: 7px 14px; border: 0; border-radius: 999px; cursor: pointer; font: 600 13px/1.2 var(--sans); color: var(--foam); background: rgba(255,246,236,.1); }
 .chip[aria-pressed="true"] { color: var(--ink); background: var(--apricot); }
 .list__items { list-style: none; margin: 10px -4px 0; padding: 0; max-height: min(52vh, 420px); overflow-y: auto; overscroll-behavior: contain; }
+.list__legal { margin: 10px 0 0; font-size: 12.5px; color: rgba(255,246,236,.6); }
+.list__legal a { color: inherit; }
 .list__empty { padding: 14px 4px; color: rgba(255,246,236,.75); font-size: 14px; }
 .item { display: flex; gap: 12px; width: 100%; padding: 12px 8px; border: 0; border-radius: 14px; cursor: pointer; text-align: left; color: var(--foam); background: none; font: inherit; }
 .item:hover, .item.is-selected { background: rgba(255,246,236,.08); }

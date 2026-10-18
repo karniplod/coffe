@@ -464,6 +464,32 @@ try {
         } elseif (is_file($ht) && strpos((string)file_get_contents($ht), 'RewriteRule') === false) {
             say('warn', 'в .htaccess нет правил MODX — адреса страниц могут не открываться; возьмите правила из ht.access');
         }
+        // заголовки безопасности: свой блок между метками — повторный запуск его обновит, а не задублирует
+        $sec = "# BEGIN Fastcup security (fc-install.php)
+<IfModule mod_headers.c>
+"
+             . "  Header always set X-Content-Type-Options \"nosniff\"
+"
+             . "  Header always set X-Frame-Options \"SAMEORIGIN\"
+"
+             . "  Header always set Referrer-Policy \"strict-origin-when-cross-origin\"
+"
+             . "  Header always set Permissions-Policy \"geolocation=(self), camera=(), microphone=(), payment=(), usb=()\"
+"
+             . "  Header always set Strict-Transport-Security \"max-age=31536000\" \"expr=%{HTTPS} == 'on'\"
+"
+             . "</IfModule>
+# END Fastcup security
+";
+        $cur = is_file($ht) ? (string)file_get_contents($ht) : '';
+        $next = preg_match('~# BEGIN Fastcup security.*?# END Fastcup security
+?~s', $cur) ? preg_replace('~# BEGIN Fastcup security.*?# END Fastcup security
+?~s', $sec, $cur) : $sec . "
+" . $cur;
+        if ($next !== $cur && (is_file($ht) || $dry)) {
+            say('upd', '.htaccess: заголовки безопасности (запрет встраивания сайта, геопозиция только для своего сайта, HTTPS)');
+            if (!$dry) { if ($cur !== '') backup('files', '.htaccess', $cur); if (@file_put_contents($ht, $next) === false) say('error', 'не удалось записать заголовки безопасности в .htaccess'); }
+        }
     }
 
     // --- 11. страницы

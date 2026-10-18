@@ -19,6 +19,10 @@
     (span || a).textContent = CFG.email;
   });
   var y = document.getElementById("year"); if (y) y.textContent = new Date().getFullYear();
+  var L = CFG.legal || {};   // реквизиты в подвале — из config.js
+  document.querySelectorAll(".js-legal").forEach(function (el) {
+    if (L.inn) el.textContent = (L.name || "").replace("Индивидуальный предприниматель", "ИП") + " · ИНН " + L.inn + (L.ogrnip ? " · ОГРНИП " + L.ogrnip : "");
+  });
 
   /* ---------- мобильное меню ---------- */
   var burger = document.querySelector(".burger");
@@ -431,6 +435,11 @@
       status.className = "form__status is-err";
       status.textContent = !name ? "Укажите имя, чтобы мы знали, как к вам обращаться" : "Проверьте телефон: нужно минимум 10 цифр";
       bad[0].focus(); return;
+    }
+    if (!el["agree"].checked) {   // согласие на обработку данных — обязательно (152-ФЗ)
+      status.className = "form__status is-err";
+      status.textContent = "Отметьте согласие на обработку персональных данных";
+      el["agree"].focus(); return;
     }
     var data = { name: name, phone: phone, topic: el["topic"].value, message: el["message"].value.trim(), page: location.href };
     var btn = form.querySelector("button[type=submit]");

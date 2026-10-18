@@ -458,6 +458,48 @@ $manifest = <<<'JSON'
    "help": "Только число: 150"
   },
   {
+   "key": "fc_legal_name",
+   "value": "Индивидуальный предприниматель Нелюбин Максим Николаевич",
+   "name": "Оператор персональных данных",
+   "cc": "Реквизиты",
+   "help": "Полное наименование: «Индивидуальный предприниматель …». В подвале сокращается до «ИП …»"
+  },
+  {
+   "key": "fc_inn",
+   "value": "590303416168",
+   "name": "ИНН",
+   "cc": "Реквизиты",
+   "help": "Только цифры"
+  },
+  {
+   "key": "fc_ogrnip",
+   "value": "326595800080130",
+   "name": "ОГРНИП",
+   "cc": "Реквизиты",
+   "help": "Только цифры"
+  },
+  {
+   "key": "fc_pd_email",
+   "value": "Maks_pochta@bk.ru",
+   "name": "Почта для обращений по персональным данным",
+   "cc": "Реквизиты",
+   "help": "Указывается в политике и согласии"
+  },
+  {
+   "key": "fc_ym_id",
+   "value": "",
+   "name": "Номер счётчика Яндекс Метрики",
+   "cc": "Аналитика",
+   "help": "Только цифры. Пусто — Метрика не подключается. Счётчик грузится только после согласия посетителя на аналитические cookie"
+  },
+  {
+   "key": "fc_cookie_ver",
+   "value": "2026-10-18",
+   "name": "Версия политики cookie",
+   "cc": "Аналитика",
+   "help": "Дата. Поменяли состав cookie (например, подключили Метрику) — поменяйте дату: баннер снова спросит согласие"
+  },
+  {
    "key": "fc_map_center",
    "value": "58.0105, 56.2294",
    "name": "Центр карты",
@@ -500,11 +542,27 @@ $manifest = <<<'JSON'
    "name": "ID страницы политики",
    "cc": "",
    "help": "Заполняет установщик"
+  },
+  {
+   "key": "fc_agree_id",
+   "value": "",
+   "name": "ID страницы согласия",
+   "cc": "",
+   "help": "Заполняет установщик"
+  },
+  {
+   "key": "fc_cookie_id",
+   "value": "",
+   "name": "ID страницы политики cookie",
+   "cc": "",
+   "help": "Заполняет установщик"
   }
  ],
  "cc_groups": {
   "Контакты": "Телефон, почта, MAX и Telegram — на сайте, в форме и в приложении",
   "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты",
+  "Реквизиты": "Оператор персональных данных для подвала, политики и согласия (домашний адрес не публикуется)",
+  "Аналитика": "Яндекс Метрика и баннер cookie",
   "Приложение": "Дополнительные возможности приложения /app/ — по умолчанию выключены"
  },
  "managed_files": [
@@ -514,7 +572,9 @@ $manifest = <<<'JSON'
  "id_settings": {
   "fc_menu_id": "menu",
   "fc_points_id": "tochki",
-  "fc_policy_id": "politika"
+  "fc_policy_id": "politika",
+  "fc_agree_id": "soglasie",
+  "fc_cookie_id": "cookie"
  }
 }
 JSON;
@@ -849,6 +909,32 @@ try {
             if (!$dry && !@copy(MODX_BASE_PATH . 'ht.access', $ht)) say('error', 'не удалось создать .htaccess — переименуйте ht.access в .htaccess в корне сайта вручную');
         } elseif (is_file($ht) && strpos((string)file_get_contents($ht), 'RewriteRule') === false) {
             say('warn', 'в .htaccess нет правил MODX — адреса страниц могут не открываться; возьмите правила из ht.access');
+        }
+        // заголовки безопасности: свой блок между метками — повторный запуск его обновит, а не задублирует
+        $sec = "# BEGIN Fastcup security (fc-install.php)
+<IfModule mod_headers.c>
+"
+             . "  Header always set X-Content-Type-Options \"nosniff\"
+"
+             . "  Header always set X-Frame-Options \"SAMEORIGIN\"
+"
+             . "  Header always set Referrer-Policy \"strict-origin-when-cross-origin\"
+"
+             . "  Header always set Permissions-Policy \"geolocation=(self), camera=(), microphone=(), payment=(), usb=()\"
+"
+             . "  Header always set Strict-Transport-Security \"max-age=31536000\" \"expr=%{HTTPS} == 'on'\"
+"
+             . "</IfModule>
+# END Fastcup security
+";
+        $cur = is_file($ht) ? (string)file_get_contents($ht) : '';
+        $next = preg_match('~# BEGIN Fastcup security.*?# END Fastcup security
+?~s', $cur) ? preg_replace('~# BEGIN Fastcup security.*?# END Fastcup security
+?~s', $sec, $cur) : $sec . "
+" . $cur;
+        if ($next !== $cur && (is_file($ht) || $dry)) {
+            say('upd', '.htaccess: заголовки безопасности (запрет встраивания сайта, геопозиция только для своего сайта, HTTPS)');
+            if (!$dry) { if ($cur !== '') backup('files', '.htaccess', $cur); if (@file_put_contents($ht, $next) === false) say('error', 'не удалось записать заголовки безопасности в .htaccess'); }
         }
     }
 

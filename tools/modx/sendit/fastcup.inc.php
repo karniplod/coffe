@@ -23,7 +23,8 @@ return array_merge($base, [
         'formName'     => 'Заявка с сайта',
         'formFields'   => 'name,phone,topic,message,page',
         'fieldNames'   => 'name==Имя,phone==Телефон,topic==Что интересует,message==Комментарий,page==Страница',
-        'validate'     => 'name:required,phone:required:minLength=^10^',
+        'validate'     => 'name:required,phone:required:minLength=^10^,agree:checkbox:required',   // agree — согласие на обработку ПД (152-ФЗ); :checkbox — неотмеченную галочку браузер не отправляет вовсе
+        'agree.vTextRequired'  => 'Отметьте согласие на обработку персональных данных',
         'name.vTextRequired'   => 'Укажите имя, чтобы мы знали, как к вам обращаться',
         'phone.vTextRequired'  => 'Укажите телефон, чтобы мы могли перезвонить',
         'phone.vTextMinLength' => 'Проверьте телефон: нужно минимум 10 цифр',

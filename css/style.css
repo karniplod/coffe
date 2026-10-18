@@ -499,7 +499,7 @@ p { margin: 0; }
 .field { display: grid; gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
 .field label, .field legend { font-size: 14px; font-weight: 600; padding: 0; }
 .opt { font-weight: 400; color: var(--muted); }
-.form input:not([type="radio"]), .form textarea {
+.form input:not([type="radio"]):not([type="checkbox"]), .form textarea {
   width: 100%; min-height: 52px; padding: 13px 16px;
   font: 16px/1.4 var(--sans); color: var(--ink);
   background: #fff; border: 1.5px solid #E7D3C0; border-radius: 12px;
@@ -516,8 +516,10 @@ p { margin: 0; }
 .form .btn { width: 100%; }
 .form__status { font-size: 15px; min-height: 1.4em; }
 .form__status.is-ok { color: #2E7D4F; } .form__status.is-err { color: #C0392B; }
-.form__legal { font-size: 12px; color: var(--muted); }
-.form__legal a { color: inherit; }
+/* согласие на обработку данных — отдельная галочка */
+.agree { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; line-height: 1.45; color: var(--muted); cursor: pointer; }
+.agree input { flex: none; width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--coral); }
+.agree a { color: var(--ink); text-underline-offset: 3px; }
 /* ошибки полей от SendIt (сайт на MODX): текст под полем и красная рамка */
 .form__err { margin: 0; font-size: 13px; color: #C0392B; }
 .form__err:empty { display: none; }
@@ -527,6 +529,37 @@ p { margin: 0; }
 .footer { background: var(--espresso); color: rgba(255,246,236,.7); text-align: center; padding: 56px var(--gutter) 40px; display: grid; justify-items: center; gap: 10px; font-size: 14px; }
 .footer img { width: 200px; opacity: .9; margin-bottom: 6px; }
 .footer__copy { opacity: .6; }
+.footer__docs { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 18px; margin-top: 6px; }
+.footer__docs a, .footer__docs button { padding: 6px 0; border: 0; background: none; font: inherit; color: rgba(255,246,236,.8); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.footer__docs a:hover, .footer__docs button:hover { color: var(--apricot); }
+.footer__req { font-size: 13px; opacity: .7; }
+
+/* ---------- баннер cookie (js/cookies.js) ---------- */
+.ck { position: fixed; left: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 70; width: min(560px, calc(100% - 48px)); animation: ck-in .35s ease; }
+.ck[hidden], .ck [hidden] { display: none; }
+@keyframes ck-in { from { opacity: 0; transform: translateY(16px); } }
+.ck__in { padding: 20px 22px 18px; border-radius: 22px; background: rgba(30,18,14,.96); color: var(--foam); box-shadow: 0 20px 50px -16px rgba(0,0,0,.65), inset 0 0 0 1px rgba(255,246,236,.12); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.ck__t { margin: 0 0 6px; font: 600 18px/1.3 var(--sans); }
+.ck__x { margin: 0; font-size: 14px; line-height: 1.55; color: rgba(255,246,236,.82); }
+.ck__x a { color: var(--apricot); text-underline-offset: 3px; }
+.ck__opts { display: grid; gap: 10px; margin-top: 14px; }
+.ck__o { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: rgba(255,246,236,.06); cursor: pointer; }
+.ck__o input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--coral); }
+.ck__o b { display: block; font-size: 15px; }
+.ck__o small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: rgba(255,246,236,.7); }
+.ck__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.ck__b { flex: 1 1 0; min-width: 150px; min-height: 46px; padding: 0 16px; border: 0; border-radius: 999px; cursor: pointer; font: 600 15px/1.2 var(--sans); color: var(--foam); background: rgba(255,246,236,.1); box-shadow: inset 0 0 0 1.5px rgba(255,246,236,.45); }
+.ck__b--main { color: #fff; background: var(--sunset); box-shadow: none; }
+.ck__l { min-height: 44px; padding: 0 6px; border: 0; background: none; cursor: pointer; font: 600 14px/1.2 var(--sans); color: var(--apricot); text-decoration: underline; text-underline-offset: 3px; }
+html.ck-on .totop { bottom: calc(var(--ck-h, 0px) + 36px); }   /* «Наверх» над баннером */
+@media (max-width: 720px) {
+  .ck { left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); width: auto; }
+  .ck__in { padding: 16px 16px 14px; }
+  .ck__x { font-size: 13.5px; }
+  .ck__b { min-width: 0; min-height: 44px; padding: 0 10px; font-size: 14px; }
+  .ck__l { flex-basis: 100%; text-align: center; }
+  html.ck-on .totop { bottom: calc(var(--ck-h, 0px) + 20px); }
+}
 
 /* ---------- текстовые страницы (политика конфиденциальности на MODX: шаблон fc-page) ---------- */
 .doc-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px var(--gutter); border-bottom: 1px solid #EFDCC8; }
@@ -538,6 +571,13 @@ p { margin: 0; }
 .doc p, .doc li { margin-top: 12px; color: var(--ink); }
 .doc ul { padding-left: 22px; }
 .doc__note { padding: 14px 18px; border-radius: var(--radius-sm); background: #FFEDE4; color: var(--dusk) !important; }
+.doc__date { color: var(--muted) !important; font-size: 14px; }
+.doc a { color: var(--coral); text-underline-offset: 3px; }
+.doc__table { overflow-x: auto; margin-top: 14px; }
+.doc__table table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.doc__table th, .doc__table td { padding: 10px 12px; border-bottom: 1px solid #EFDCC8; text-align: left; vertical-align: top; }
+.doc__table thead th { font-weight: 600; background: #FFF0E2; }
+.doc__btn { min-height: 46px; padding: 0 22px; border: 0; border-radius: 999px; cursor: pointer; font: 600 15px/1.2 var(--sans); color: #fff; background: var(--sunset); }
 
 /* ---------- адаптив ---------- */
 /* меню в шапке не помещается по бокам от логотипа — прячем, слева появляется кнопка меню */

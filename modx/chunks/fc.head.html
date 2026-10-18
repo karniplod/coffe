@@ -20,8 +20,9 @@
   <meta property="og:image" content="[[++site_url]]images/web/banner-cup.jpg">
   <link rel="icon" href="/images/web/favicon.png">
   <link rel="apple-touch-icon" href="/images/web/apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@400;500;600;700&display=swap&subset=cyrillic" rel="stylesheet">
+  <!-- шрифты — с самого сайта (fonts/), без запросов к Google -->
+  <link rel="preload" href="fonts/caveat-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/fonts.css">
   <link rel="stylesheet" href="/css/omap.css">
   <link rel="stylesheet" href="/css/style.css">

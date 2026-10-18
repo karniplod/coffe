@@ -43,9 +43,10 @@
           <label for="f-msg">Комментарий <span class="opt">необязательно</span></label>
           <textarea id="f-msg" name="message" rows="3"></textarea>
         </div>
+        <label class="agree"><input type="checkbox" name="agree" value="1" required> <span>Даю <a href="[[~[[++fc_agree_id]]]]" target="_blank">согласие на обработку персональных данных</a> и принимаю <a href="[[~[[++fc_policy_id]]]]" target="_blank">политику обработки данных</a></span></label>
+        <p class="form__err" data-si-error="agree" aria-live="polite"></p>
         <button class="btn btn--sunset" type="submit">Отправить заявку</button>
         <p class="form__status" id="formStatus" role="status"></p>
-        <p class="form__legal">Нажимая кнопку, вы соглашаетесь на <a href="[[~[[++fc_policy_id]]]]">обработку персональных данных</a>.</p>
       </form>
     </div>
   </section>

@@ -68,6 +68,11 @@ def text_of(fragment):
 
 
 # ---------------------------------------------------------------- данные из сайта
+sys.path.insert(0, os.path.join(ROOT, "tools"))
+import build_legal   # страницы документов для сайта без MODX — из тех же текстов
+print("Страницы документов:", ", ".join(build_legal.build()))
+LEGAL = build_legal.config()
+
 page = read("index.html")
 cfg_js = read("js/config.js")
 points_js = read("js/points.js")
@@ -134,6 +139,11 @@ def contacts(s):
     s = s.replace(CONTACTS["email"], "[[++fc_email]]")
     s = s.replace(CONTACTS["max"], "[[++fc_max_url]]")
     s = s.replace(CONTACTS["telegram"], "[[++fc_telegram_url]]")
+    # документы: ссылки — на страницы MODX, реквизиты — из настроек
+    s = s.replace('href="politika.html"', 'href="[[~[[++fc_policy_id]]]]"').replace('href="soglasie.html"', 'href="[[~[[++fc_agree_id]]]]"')
+    s = s.replace('href="cookie.html"', 'href="[[~[[++fc_cookie_id]]]]"').replace('data-policy="cookie.html"', 'data-policy="[[~[[++fc_cookie_id]]]]"')
+    s = s.replace("ИНН " + LEGAL["fc_inn"], "ИНН [[++fc_inn]]").replace("ОГРНИП " + LEGAL["fc_ogrnip"], "ОГРНИП [[++fc_ogrnip]]")
+    s = s.replace(LEGAL["fc_legal_name"].replace("Индивидуальный предприниматель", "ИП"), "[[++fc_legal_name:replace=`Индивидуальный предприниматель==ИП`]]")
     return s
 
 
@@ -187,8 +197,8 @@ f = must_replace(f, '<form class="form" id="leadForm" novalidate>',
                  '        <input type="hidden" name="page" value="[[*pagetitle]] ([[~[[*id]]? &scheme=`full`]])">', "форма")
 for field in ("name", "phone"):
     f = re.sub(r'(<input id="f-%s"[^>]*>)' % field, r'\1\n          <p class="form__err" data-si-error="%s" aria-live="polite"></p>' % field, f, count=1)
-f = must_replace(f, '<p class="form__legal">Нажимая кнопку, вы соглашаетесь на обработку персональных данных.</p>',
-                 '<p class="form__legal">Нажимая кнопку, вы соглашаетесь на <a href="[[~[[++fc_policy_id]]]]">обработку персональных данных</a>.</p>', "согласие")
+if 'name="agree"' not in f:
+    sys.exit("В форме нет галочки согласия name=\"agree\" — без неё SendIt не примет заявку (152-ФЗ)")
 CHUNKS["fc.contacts"] = f
 
 # подвал и скрипты
@@ -209,6 +219,8 @@ h = h.replace("https://example.ru/", "[[++site_url]]")
 CHUNKS["fc.head"] = common(h)
 
 ld = ld.replace("https://example.ru/", "[[++site_url]]")
+ld = must_replace(ld, '"legalName": "%s"' % LEGAL["fc_legal_name"], '"legalName": "[[++fc_legal_name]]"', "legalName")
+ld = must_replace(ld, '"taxID": "%s"' % LEGAL["fc_inn"], '"taxID": "[[++fc_inn]]"', "taxID")
 ld = ld.replace('"telephone": "%s"' % CONTACTS["phoneHref"], '"telephone": "[[++fc_phone_raw]]"')
 ld = must_replace(ld, '"sameAs": ["%s"]' % CONTACTS["telegram"], '"email": "[[++fc_email]]",\n        "sameAs": ["[[++fc_telegram_url]]", "[[++fc_max_url]]"]', "sameAs")
 ld = re.sub(r'"priceRange": "[^"]*"', '"priceRange": "[[++fc_price_200]]–[[++fc_price_300]] ₽"', ld)
@@ -307,6 +319,16 @@ SETTINGS = [
     {"key": "fc_telegram_url", "value": CONTACTS["telegram"], "name": "Ссылка на Telegram", "cc": "Контакты", "help": "Полная ссылка https://t.me/…"},
     {"key": "fc_price_200", "value": PRICE200, "name": "Цена 200 мл, ₽", "cc": "Цены и карта", "help": "Только число: 100"},
     {"key": "fc_price_300", "value": PRICE300, "name": "Цена 300 мл, ₽", "cc": "Цены и карта", "help": "Только число: 150"},
+    {"key": "fc_legal_name", "value": LEGAL["fc_legal_name"], "name": "Оператор персональных данных", "cc": "Реквизиты",
+     "help": "Полное наименование: «Индивидуальный предприниматель …». В подвале сокращается до «ИП …»"},
+    {"key": "fc_inn", "value": LEGAL["fc_inn"], "name": "ИНН", "cc": "Реквизиты", "help": "Только цифры"},
+    {"key": "fc_ogrnip", "value": LEGAL["fc_ogrnip"], "name": "ОГРНИП", "cc": "Реквизиты", "help": "Только цифры"},
+    {"key": "fc_pd_email", "value": LEGAL["fc_pd_email"], "name": "Почта для обращений по персональным данным", "cc": "Реквизиты",
+     "help": "Указывается в политике и согласии"},
+    {"key": "fc_ym_id", "value": "", "name": "Номер счётчика Яндекс Метрики", "cc": "Аналитика",
+     "help": "Только цифры. Пусто — Метрика не подключается. Счётчик грузится только после согласия посетителя на аналитические cookie"},
+    {"key": "fc_cookie_ver", "value": "2026-10-18", "name": "Версия политики cookie", "cc": "Аналитика",
+     "help": "Дата. Поменяли состав cookie (например, подключили Метрику) — поменяйте дату: баннер снова спросит согласие"},
     {"key": "fc_map_center", "value": CENTER, "name": "Центр карты", "cc": "Цены и карта", "help": "«широта, долгота» — если точек нет: 58.0105, 56.2294"},
     {"key": "fc_promos", "value": "1" if FEATURES.get("promos") else "0", "name": "Акции и цены точек в приложении", "cc": "Приложение", "xtype": "xcheckbox",
      "help": "Значок «%» на метке, акция и цена в карточке, фильтры «Только с акциями» и «Сначала дешевле». Акции — в поле точки «Акция в этой точке»"},
@@ -315,6 +337,8 @@ SETTINGS = [
     {"key": "fc_menu_id", "value": "", "name": "ID раздела «Меню»", "cc": "", "help": "Заполняет установщик"},
     {"key": "fc_points_id", "value": "", "name": "ID раздела «Точки»", "cc": "", "help": "Заполняет установщик"},
     {"key": "fc_policy_id", "value": "", "name": "ID страницы политики", "cc": "", "help": "Заполняет установщик"},
+    {"key": "fc_agree_id", "value": "", "name": "ID страницы согласия", "cc": "", "help": "Заполняет установщик"},
+    {"key": "fc_cookie_id", "value": "", "name": "ID страницы политики cookie", "cc": "", "help": "Заполняет установщик"},
 ]
 
 RES = [{
@@ -336,13 +360,12 @@ RES.append({"alias": "tochki", "parent": "", "template": "fc-section", "isfolder
 for p in POINTS:
     RES.append({"alias": alias(p["title"]), "parent": "tochki", "template": "fc-point", "hidemenu": 1, "searchable": 0,
                 "fields": {"pagetitle": p["title"]}, "tvs": {"fc_point_address": p["address"], "fc_point_hours": p["hours"], "fc_point_coords": p["coords"]}})
+for a_, (t_, d_) in build_legal.PAGES.items():   # документы: политика, согласие, cookie — тексты из tools/modx/content/
+    RES.append({"alias": a_, "parent": "", "template": "fc-page", "hidemenu": 1, "richtext": 1,
+                "fields": {"pagetitle": t_, "longtitle": t_ + " — Fastcup", "description": d_,
+                           "content": io.open(os.path.join(SRC, "content", a_ + ".html"), encoding="utf-8").read().strip()},
+                "tvs": {}})
 RES += [{
-    "alias": "politika", "parent": "", "template": "fc-page", "hidemenu": 1, "richtext": 1,
-    "fields": {"pagetitle": "Политика конфиденциальности", "longtitle": "Политика обработки персональных данных",
-               "description": "Как Fastcup обрабатывает персональные данные из формы заявки на сайте",
-               "content": io.open(os.path.join(SRC, "content", "politika.html"), encoding="utf-8").read().strip()},
-    "tvs": {},
-}, {
     "alias": "robots", "parent": "", "template": "", "hidemenu": 1, "searchable": 0, "always": True, "content_type": "text/plain",
     "fields": {"pagetitle": "robots.txt", "content": "User-agent: *\nAllow: /\nDisallow: /manager/\nDisallow: /fastcup-modx/\n\nSitemap: [[++site_url]]sitemap.xml"},
     "tvs": {},
@@ -359,18 +382,20 @@ manifest = {
     "chunks": chunk_list, "templates": templates, "snippets": snippets, "plugins": plugins, "tvs": TVS, "settings": SETTINGS,
     "cc_groups": {"Контакты": "Телефон, почта, MAX и Telegram — на сайте, в форме и в приложении",
                   "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты",
+                  "Реквизиты": "Оператор персональных данных для подвала, политики и согласия (домашний адрес не публикуется)",
+                  "Аналитика": "Яндекс Метрика и баннер cookie",
                   "Приложение": "Дополнительные возможности приложения /app/ — по умолчанию выключены"},
     "managed_files": ["js/points.js", "js/config.js"],   # их пересоздаёт MODX: из архива — только если на сервере их ещё нет
-    "id_settings": {"fc_menu_id": "menu", "fc_points_id": "tochki", "fc_policy_id": "politika"},
+    "id_settings": {"fc_menu_id": "menu", "fc_points_id": "tochki", "fc_policy_id": "politika", "fc_agree_id": "soglasie", "fc_cookie_id": "cookie"},
 }
 tpl = io.open(os.path.join(SRC, "fc-install.inc.php.tpl"), encoding="utf-8").read()
 write("fc-install.inc.php", tpl.replace("%%MANIFEST%%", json.dumps(manifest, ensure_ascii=False, indent=1)))
-for f in ("fc-install.php", "INSTALL.md", ".htaccess"):
-    if os.path.exists(os.path.join(SRC, f)):
-        shutil.copy(os.path.join(SRC, f), os.path.join(OUT, f))
+for f in ("fc-install.php", "INSTALL.md"):
+    shutil.copy(os.path.join(SRC, f), os.path.join(OUT, f))
+shutil.copy(os.path.join(SRC, "htaccess.txt"), os.path.join(OUT, ".htaccess"))   # папка установщика закрыта от браузера, кроме fc-install.php
 
 # ---------------------------------------------------------------- архив: пакет + файлы сайта
-SITE = ["css", "js", "app", os.path.join("images", "web")]
+SITE = ["css", "js", "app", "fonts", os.path.join("images", "web")]
 os.makedirs(DIST, exist_ok=True)
 zpath = os.path.join(DIST, PKG + ".zip")
 n_site = 0
