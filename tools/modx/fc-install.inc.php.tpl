@@ -22,8 +22,13 @@
  *   --no-tune / ?notune=1        не трогать настройки MODX (адреса, кэш, .htaccess)
  *   --no-clientconfig / ?nocc=1  контакты — в системные настройки, даже если установлен ClientConfig
  *   --static / ?static=1         элементы читают код из файлов этой папки (папку тогда не удалять)
- *   --force / ?force=1           продолжить, несмотря на конфликты имён
+ *   --force / ?force=1           продолжить, несмотря на конфликты имён; перезаписать и элементы, изменённые в админке
+ *   --check / ?check=1           только проверить уже установленный сайт (ничего не меняет): страницы, файлы, безопасность, почта
  *   --root=путь                  корень сайта, если скрипт не находит MODX сам
+ *
+ * Обновление: загрузите новый архив и запустите установщик снова. Обновится только изменённое. Если чанк, шаблон или сниппет
+ * поменяли в админке после прошлой установки — он НЕ перезаписывается (ваш вариант остаётся), новая версия кладётся в резервную копию.
+ * Что ставил установщик, он помнит в системной настройке fc_install_state.
  *
  * Безопасность: проверки до любых изменений; перед перезаписью — резервная копия в core/cache/fc-install-backup/<дата>/;
  * ошибка одного шага не останавливает остальные; журнал — core/cache/logs/fc-install-<дата>.log.
@@ -48,6 +53,7 @@ $noTune = $opt('--no-tune', 'notune');
 $noCc = $opt('--no-clientconfig', 'nocc');
 $static = $opt('--static', 'static');
 $force = $opt('--force', 'force');
+$checkOnly = $opt('--check', 'check');
 $dir = __DIR__;
 if (basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) { echo "Запускайте fc-install.php, а не этот файл.\n"; exit(2); }
 $stamp = date('Ymd-His');
@@ -136,6 +142,14 @@ JSON;
 $M = json_decode($manifest, true);
 if (!is_array($M)) stop('Описание сайта внутри установщика повреждено (' . json_last_error_msg() . '). Загрузите fc-install.inc.php заново.');
 
+if ($checkOnly) {   // ?check=1 — только самопроверка, без установки
+    $norm0 = function ($p) { $r = realpath($p); return rtrim(str_replace('\\', '/', $r ?: $p), '/') . '/'; };
+    $inside = stripos($norm0($dir), $norm0(MODX_BASE_PATH)) === 0; $static = false;
+    $staticPrefix = $inside ? substr($norm0($dir), strlen($norm0(MODX_BASE_PATH))) : '';
+    selfCheck();
+    report(true);
+}
+
 $problems = [];   // не пройдено — ничего не меняем
 $warnings = [];   // можно продолжать
 
@@ -191,8 +205,8 @@ function backup($type, $name, $data) {
     $safe = preg_replace('~[^\w.\-]+~u', '_', $name);
     $d = $backupDir . $type . '/';
     if (!is_dir($d) && !@mkdir($d, 0755, true)) { say('error', "не удалось создать папку резервной копии $d"); return; }
-    $ext = is_string($data) ? ($type === 'snippets' || $type === 'plugins' ? '.php' : ($type === 'files' ? '' : '.html')) : '.json';
-    $text = is_string($data) ? ($type === 'snippets' || $type === 'plugins' ? "<?php\n" . $data : $data) : json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $ext = is_string($data) ? (in_array(basename($type), ['snippets', 'plugins'], true) ? '.php' : ($type === 'files' ? '' : '.html')) : '.json';
+    $text = is_string($data) ? (in_array(basename($type), ['snippets', 'plugins'], true) ? "<?php\n" . $data : $data) : json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     if (@file_put_contents($d . $safe . $ext, $text) === false) { say('error', "не удалось сохранить резервную копию: $type/$name"); return; }
     $backedUp++;
 }
@@ -288,6 +302,11 @@ if (!$noCc && is_dir(MODX_CORE_PATH . 'components/clientconfig/')) {
     if (!$cc) say('warn', 'ClientConfig найден, но его модель не загрузилась — контакты запишу в системные настройки fc_*');
 }
 
+// --- что ставил установщик в прошлый раз (контрольные суммы элементов) и версия пакета
+$stateSetting = $modx->getObject(modSystemSetting::class, 'fc_install_state');
+$state = $stateSetting ? (array)json_decode((string)$stateSetting->get('value'), true) : [];
+$prevVersion = (string)($state['_version'] ?? '');
+
 // --- категории и элементы
 $catIds = [];
 function category($name, $parent = 0) {
@@ -312,16 +331,27 @@ if ($inside) { $staticSource = (int)$modx->getOption('default_media_source', nul
 else { $staticSource = 0; $staticPrefix = $here; }
 $typeDir = [modChunk::class => 'chunks', modTemplate::class => 'templates', modSnippet::class => 'snippets', modPlugin::class => 'plugins'];
 function element($class, $nameField, $name, $content, $catId, $desc, $file) {
-    global $modx, $static, $staticSource, $staticPrefix, $typeDir;
+    global $modx, $static, $staticSource, $staticPrefix, $typeDir, $state, $force, $dry;
     try {
         if (trim((string)$content) === '') { say('error', "$name: файл $file пустой или не читается — элемент не создан"); return null; }
         $o = $modx->getObject($class, [$nameField => $name]);
         $isNew = !$o;
+        $key = $typeDir[$class] . '/' . $name;
         if ($isNew) $o = $modx->newObject($class);
         else {
-            if ((string)$o->getContent() === (string)$content && (int)$o->get('category') === (int)$catId && (bool)$o->get('static') === (bool)$static) { say('skip', "без изменений: $name"); return $o; }
-            backup($typeDir[$class], $name, (string)$o->getContent());
+            $cur = (string)$o->getContent();
+            if ($cur === (string)$content && (int)$o->get('category') === (int)$catId && (bool)$o->get('static') === (bool)$static) {
+                $state[$key] = md5($cur); say('skip', "без изменений: $name"); return $o;
+            }
+            // правили в админке после прошлой установки (не то, что ставил установщик) — не трогаем, если не --force
+            if (isset($state[$key]) && $state[$key] !== md5($cur) && !$force) {
+                if (!$dry) backup('new-versions/' . $typeDir[$class], $name, (string)$content);
+                say('warn', "$name изменён в админке — оставил ваш вариант; новая версия из архива — в резервной копии (new-versions). Перезаписать: ?force=1");
+                return $o;
+            }
+            backup($typeDir[$class], $name, $cur);
         }
+        $state[$key] = md5((string)$content);
         $data = [$nameField => $name, 'description' => $desc, 'category' => $catId];
         $data += $static ? ['static' => 1, 'source' => $staticSource, 'static_file' => $staticPrefix . $file] : ['static' => 0, 'static_file' => ''];
         $o->fromArray($data);
@@ -585,17 +615,103 @@ if (!$dry && $modx->getOption('friendly_urls')) {
     try { modResource::refreshURIs($modx); say('upd', 'адреса страниц пересчитаны'); } catch (Throwable $e) { say('warn', 'адреса страниц не пересчитались: ' . $e->getMessage() . ' — очистите кэш в админке'); }
 }
 if (!$dry) { try { $modx->cacheManager->refresh(); } catch (Throwable $e) { say('warn', 'кэш не очистился: очистите вручную (Управление → Очистить кэш)'); } }
+if (!$dry && !$checkOnly) {   // запомнить, что поставили: при следующем обновлении правки из админки не перезапишутся
+    $state['_version'] = $M['version'];
+    if (setting('fc_install_state', json_encode($state, JSON_UNESCAPED_UNICODE))) {}
+    say(!$prevVersion ? 'new' : ($prevVersion !== $M['version'] ? 'upd' : 'skip'), $prevVersion ? ($prevVersion === $M['version'] ? "версия сайта {$M['version']} (та же)" : "сайт обновлён с версии $prevVersion до {$M['version']}") : "установлена версия сайта {$M['version']}");
+}
+if (!$dry) selfCheck();
 
 report(true);
+
+/* ---------------------------------------------------------------- самопроверка
+   Открывает свой сайт как посетитель и проверяет: страницы, приложение, файлы в assets/, безопасность, почту, заполненность настроек.
+   «проверено» — всё хорошо, «внимание» — стоит поправить, «ошибка» — сайт работает неправильно. */
+function httpGet($url, $follow = false) {   // [код, заголовки (строчными), тело]
+    if (function_exists('curl_init')) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_FOLLOWLOCATION => $follow, CURLOPT_TIMEOUT => 20,
+            CURLOPT_CONNECTTIMEOUT => 8, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_USERAGENT => 'Fastcup-selfcheck']);
+        $res = curl_exec($ch);
+        $code = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE); $hs = (int)curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        curl_close($ch);
+        if ($res === false) return [0, '', ''];
+        return [$code, strtolower(substr($res, 0, $hs)), (string)substr($res, $hs)];
+    }
+    $ctx = stream_context_create(['http' => ['ignore_errors' => true, 'follow_location' => $follow ? 1 : 0, 'timeout' => 20, 'header' => "User-Agent: Fastcup-selfcheck\r\n"],
+                                  'ssl' => ['verify_peer' => false, 'verify_peer_name' => false]]);
+    $body = @file_get_contents($url, false, $ctx);
+    $hdr = isset($http_response_header) ? strtolower(implode("\n", $http_response_header)) : '';
+    $code = preg_match('~^http/\S+\s+(\d+)~', $hdr, $m) ? (int)$m[1] : 0;
+    return [$code, $hdr, (string)$body];
+}
+function selfCheck() {
+    global $modx, $dir, $inside, $staticPrefix;
+    say('skip', '— самопроверка сайта —');
+    $base = rtrim((string)$modx->getOption('site_url'), '/') . '/';
+    [$code, $hdr, $body] = httpGet($base);
+    if ($code === 0) { say('warn', "самопроверка: сервер не открыл свой же сайт $base (хостинг не разрешает запросы к себе?) — проверьте сайт в браузере вручную"); return; }
+    $page = function ($path, $label, $must = []) use ($base) {
+        [$c, , $b] = httpGet($base . $path);
+        $bad = [];
+        if ($c !== 200) $bad[] = "код ответа $c";
+        if (strpos($b, '[[') !== false) $bad[] = 'остались теги MODX';
+        foreach ($must as $m) if (strpos($b, $m) === false) $bad[] = "нет «{$m}»";
+        say($bad ? 'error' : 'ok', "$label (/$path)" . ($bad ? ': ' . implode(', ', $bad) : ''));
+    };
+    $page('', 'главная', ['class="hero', 'application/ld+json']);
+    $page('politika', 'политика обработки персональных данных', ['ИНН']);
+    $page('soglasie', 'согласие на обработку персональных данных', ['ИНН']);
+    $page('cookie', 'политика cookie');
+    $page('robots.txt', 'robots.txt', ['Sitemap:']);
+    $page('sitemap.xml', 'карта сайта', ['<urlset']);
+    [$c, $h] = httpGet($base . 'app');
+    say(in_array($c, [301, 302], true) && strpos($h, 'assets/app/') !== false ? 'ok' : 'error', 'короткий адрес /app ведёт в приложение' . (in_array($c, [301, 302], true) ? '' : " (код $c)"));
+    foreach (['assets/app/' => ['manifest.webmanifest', 'приложение'], 'assets/app/sw.js' => ['VERSION', 'офлайн-режим приложения'],
+              'assets/js/points.js' => ['FASTCUP_POINTS', 'точки для карты'], 'assets/js/config.js' => ['FASTCUP_CONFIG', 'настройки для карты и приложения'],
+              'assets/css/style.css' => ['', 'стили'], 'assets/fonts/inter-cyrillic.woff2' => ['', 'шрифты'],
+              'assets/images/web/map/0/0-0.webp' => ['', 'картинки карты'], 'assets/images/web/logo-word-light.png' => ['', 'логотип']] as $path => [$must, $label]) {
+        [$c, , $b] = httpGet($base . $path);
+        $ok = $c === 200 && ($must === '' || strpos($b, $must) !== false);
+        say($ok ? 'ok' : 'error', "$label (/$path)" . ($ok ? '' : " — код $c, файла нет или он не тот: запустите установщик ещё раз"));
+    }
+    // безопасность
+    say(stripos($base, 'https://') === 0 ? 'ok' : 'warn', stripos($base, 'https://') === 0 ? 'сайт работает по https'
+        : 'сайт открывается без https — выпустите SSL-сертификат в панели хостинга (без него не работает геопозиция на телефонах)');
+    $hasSec = strpos($hdr, 'x-frame-options') !== false && strpos($hdr, 'x-content-type-options') !== false;
+    say($hasSec ? 'ok' : 'warn', $hasSec ? 'заголовки безопасности включены' : 'заголовки безопасности не пришли — на хостинге выключен mod_headers или .htaccess не читается');
+    if ($inside && is_dir($dir)) {
+        [$c] = httpGet($base . $staticPrefix . 'resources.json');
+        say($c === 200 ? 'warn' : 'ok', $c === 200 ? 'папка установщика открыта из браузера — удалите её кнопкой «Удалить папку установщика»'
+            : 'папка установщика закрыта из браузера (после проверки удалите её)');
+    }
+    // почта
+    $mailOk = function_exists('mail') && !in_array('mail', array_map('trim', explode(',', (string)ini_get('disable_functions'))), true);
+    say($mailOk ? 'ok' : 'warn', $mailOk ? 'хостинг умеет отправлять письма (заявки придут на ' . $modx->getOption('fc_email') . ') — отправьте тестовую заявку'
+        : 'на хостинге выключена отправка писем (mail) — заявки будут только в «Приложения → FormIt»');
+    // настройки
+    foreach (['fc_phone' => 'телефон', 'fc_email' => 'почта для заявок', 'fc_inn' => 'ИНН', 'fc_pd_email' => 'почта для персональных данных'] as $k => $label) {
+        if (trim((string)$modx->getOption($k)) === '') say('warn', "«Конфигурация»: не заполнено — $label");
+    }
+    if ($modx->getOption('fc_telegram_url') === 'https://t.me/fastcup_perm') say('warn', '«Конфигурация» → «Контакты»: ссылка на Telegram временная — впишите свою');
+    $examples = 0;
+    $parent = (int)$modx->getOption('fc_points_id');
+    if ($parent) foreach ($modx->getIterator(modResource::class, ['parent' => $parent, 'deleted' => 0]) as $r) {
+        if (mb_stripos((string)$r->getTVValue('fc_point_address'), 'пример') !== false) $examples++;
+    }
+    if ($examples) say('warn', "«Ресурсы» → «Точки»: $examples точек с примерами адресов — замените на настоящие");
+}
 
 // --- отчёт: экран + файл журнала
 function report($finished) {
     global $log, $dry, $cli, $logFile, $backedUp, $backupDir, $modx, $static, $inside;
-    $count = ['new' => 0, 'upd' => 0, 'skip' => 0, 'warn' => 0, 'error' => 0];
+    global $checkOnly;
+    $count = ['new' => 0, 'upd' => 0, 'skip' => 0, 'ok' => 0, 'warn' => 0, 'error' => 0];
     foreach ($log as $l) $count[$l[0]]++;
-    $title = ($dry ? 'Пробный прогон (ничего не менялось). ' : ($finished ? 'Готово. ' : 'Остановлено. '))
-           . "Создано: {$count['new']}, обновлено: {$count['upd']}, без изменений: {$count['skip']}, предупреждений: {$count['warn']}, ошибок: {$count['error']}";
-    if (!$dry && $backedUp) say('upd', "резервная копия перезаписанного ($backedUp шт.): " . str_replace(MODX_CORE_PATH, 'core/', $backupDir));
+    $title = $checkOnly ? "Проверка сайта. Проверено: {$count['ok']}, предупреждений: {$count['warn']}, ошибок: {$count['error']}"
+           : ($dry ? 'Пробный прогон (ничего не менялось). ' : ($finished ? 'Готово. ' : 'Остановлено. '))
+           . "Создано: {$count['new']}, обновлено: {$count['upd']}, без изменений: {$count['skip']}, проверено: {$count['ok']}, предупреждений: {$count['warn']}, ошибок: {$count['error']}";
+    if (!$dry && !$checkOnly && $backedUp) say('upd', "резервная копия перезаписанного ($backedUp шт.): " . str_replace(MODX_CORE_PATH, 'core/', $backupDir));
     if (!$dry) {
         $text = $title . "\n" . implode("\n", array_map(function ($l) { return "[{$l[0]}] {$l[1]}"; }, $log)) . "\n";
         if (@file_put_contents($logFile, $text) !== false) say('skip', 'журнал: ' . str_replace(MODX_CORE_PATH, 'core/', $logFile));
@@ -606,20 +722,23 @@ function report($finished) {
         foreach ($log as $l) echo "[{$l[0]}] {$l[1]}\n";
         exit($count['error'] ? 1 : 0);
     }
-    $colors = ['new' => '#1e7d45', 'upd' => '#1f5fbf', 'skip' => '#8a7a70', 'warn' => '#a35b00', 'error' => '#b3261e'];
-    $names = ['new' => 'новое', 'upd' => 'обновлено', 'skip' => 'без изменений', 'warn' => 'внимание', 'error' => 'ошибка'];
+    $colors = ['new' => '#1e7d45', 'upd' => '#1f5fbf', 'skip' => '#8a7a70', 'ok' => '#1e7d45', 'warn' => '#a35b00', 'error' => '#b3261e'];
+    $names = ['new' => 'новое', 'upd' => 'обновлено', 'skip' => 'без изменений', 'ok' => 'проверено ✓', 'warn' => 'внимание', 'error' => 'ошибка'];
     $btn = function ($href, $text, $main = false) {
         return '<a href="' . $href . '" style="display:inline-block;margin:0 8px 8px 0;padding:10px 18px;border-radius:999px;text-decoration:none;font-weight:600;'
             . ($main ? 'background:#E0674F;color:#fff' : 'background:#fff;color:#2A1A14;box-shadow:inset 0 0 0 1.5px #E7D3C0') . '">' . $text . '</a>';
     };
     $body = '';
-    if ($dry && !$count['error']) $body .= '<p>Всё верно? ' . $btn('?', 'Установить', true) . $btn('?update=1', 'Установить и перезаписать страницы') . '</p>';
+    if ($checkOnly) $body .= '<p>' . ($count['error'] ? 'Есть ошибки — смотрите красные строки. Чаще всего помогает запустить установщик ещё раз. ' : 'Сайт работает. ')
+        . $btn('?check=1', 'Проверить ещё раз') . $btn(htmlspecialchars($modx->getOption('site_url')), 'Открыть сайт', true) . '</p>';
+    elseif ($dry && !$count['error']) $body .= '<p>Всё верно? ' . $btn('?', 'Установить', true) . $btn('?update=1', 'Установить и перезаписать страницы') . '</p>';
     elseif ($dry) $body .= '<p style="color:#b3261e">Исправьте ошибки (красным) и запустите пробный прогон снова: ' . $btn('?dry=1', 'Проверить ещё раз') . '</p>';
     else {
         $site = htmlspecialchars($modx->getOption('site_url'));
         $body .= '<p>' . ($count['error'] ? 'Есть ошибки — смотрите красные строки и журнал. ' : 'Сайт установлен. ') . $btn($site, 'Открыть сайт', true)
             . $btn(htmlspecialchars(MODX_MANAGER_URL), 'Открыть админку') . '</p>'
-            . '<p>Дальше: в админке проверьте «Точки» (сейчас там примеры адресов), реквизиты в «Политике конфиденциальности» и контакты в «Конфигурация» (ClientConfig).</p>';
+            . '<p>Ниже — результаты самопроверки (зелёным «проверено ✓»). Дальше: замените примеры адресов в «Точках» и проверьте контакты в «Конфигурации». '
+            . 'Проверить сайт ещё раз можно в любой момент: ' . $btn('?check=1', 'Только проверить') . '</p>';
         if ($inside && !$static && !$count['error']) $body .= '<p>Папка установщика больше не нужна: ' . $btn('?remove=1', 'Удалить папку установщика') . '</p>';
     }
     $list = '<ul style="list-style:none;padding:0">';

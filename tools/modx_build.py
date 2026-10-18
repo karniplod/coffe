@@ -390,6 +390,7 @@ write("resources.json", json.dumps(RES, ensure_ascii=False, indent=1))
 
 manifest = {
     "top": "Fastcup", "email": CONTACTS["email"],
+    "version": __import__("datetime").datetime.now().strftime("%Y-%m-%d %H:%M"),   # версия пакета — дата сборки, видна в отчёте установщика
     "chunks": chunk_list, "templates": templates, "snippets": snippets, "plugins": plugins, "tvs": TVS, "settings": SETTINGS,
     "cc_groups": {"Контакты": "Телефон, почта, MAX и Telegram — на сайте, в форме и в приложении",
                   "Цены и карта": "Цены на напитки 200 и 300 мл и центр карты",
