@@ -141,7 +141,7 @@ $manifest = <<<'JSON'
 {
  "top": "Fastcup",
  "email": "takeawayperm@yandex.ru",
- "version": "2026-10-18 19:30",
+ "version": "2026-10-19 09:20",
  "chunks": [
   {
    "name": "fc.head",
