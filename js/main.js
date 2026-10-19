@@ -425,7 +425,70 @@
   var siBtn = form.querySelector("button[type=submit]"), siLabel = siBtn.textContent, siTimer = 0;
   function siDone() { delete form.dataset.busy; siBtn.disabled = false; siBtn.textContent = siLabel; clearTimeout(siTimer); }
   document.addEventListener("si:send:finish", siDone);   // SendIt ответил (принял или вернул ошибки) — кнопка снова работает
+
+  // Маска телефона: +7 (912) 345-67-89. Начали с 8 или 9 — всё равно получится +7
+  var phoneEl = form.elements["phone"];
+  function phoneDigits(v) {
+    var d = v.replace(/\D/g, "");
+    if (d.charAt(0) === "8") d = "7" + d.slice(1);
+    else if (d && d.charAt(0) !== "7") d = "7" + d;
+    return d.slice(0, 11);
+  }
+  function phoneFormat(d) {
+    if (!d) return "";
+    var r = "+7", p = [[1, 4, " (", ")"], [4, 7, " ", ""], [7, 9, "-", ""], [9, 11, "-", ""]];
+    for (var i = 0; i < p.length && d.length > p[i][0]; i++) {
+      var part = d.slice(p[i][0], p[i][1]);
+      r += p[i][2] + part + (part.length === p[i][1] - p[i][0] ? p[i][3] : "");
+    }
+    return r;
+  }
+  var phonePrev = "";
+  phoneEl.addEventListener("input", function (e) {
+    var v = phoneEl.value, caret = phoneEl.selectionStart == null ? v.length : phoneEl.selectionStart;
+    var before = phoneDigits(v.slice(0, caret)).length;   // сколько цифр до курсора (с учётом +7) — чтобы курсор не прыгал в конец
+    var d = phoneDigits(v);
+    // стёрли скобку, пробел или дефис — цифры те же; стираем и цифру перед ним, иначе знак вернётся обратно
+    if (e.inputType && e.inputType.indexOf("delete") === 0 && d === phonePrev && before > 0) {
+      d = d.slice(0, before - 1) + d.slice(before); before--;
+    }
+    var out = phoneFormat(d);
+    phoneEl.value = out; phonePrev = d;
+    var pos = out.length;
+    if (before < d.length) for (var i = 0, n = 0; i < out.length; i++) if (/\d/.test(out[i]) && ++n > before && i > 1) { pos = i; break; }
+    try { phoneEl.setSelectionRange(pos, pos); } catch (err) {}
+  });
+  phoneEl.addEventListener("blur", function () { if (phoneDigits(phoneEl.value).length <= 1) { phoneEl.value = ""; phonePrev = ""; } });
+
+  // Проверка полей до отправки: подсветка и подсказка под каждым полем.
+  // На MODX это важно вдвойне: пустую форму без ввода антиспам SendIt отклоняет раньше проверки полей («Проверка не пройдена»)
+  function fieldError(name, text) {
+    var input = form.elements[name], box = form.querySelector('[data-si-error="' + name + '"]');
+    input.setAttribute("aria-invalid", String(!!text));
+    if (box) box.textContent = text || "";
+  }
+  ["name", "phone", "agree"].forEach(function (n) {
+    form.elements[n].addEventListener(n === "agree" ? "change" : "input", function () {
+      if (form.elements[n].getAttribute("aria-invalid") === "true") fieldError(n, "");
+    });
+  });
+  function checkFields() {
+    var el = form.elements, bad = [];
+    var name = el["name"].value.trim(), digits = el["phone"].value.replace(/\D/g, "");
+    fieldError("name", name ? "" : "Укажите имя, чтобы мы знали, как к вам обращаться"); if (!name) bad.push(el["name"]);
+    var phoneErr = !digits ? "Укажите телефон, чтобы мы могли перезвонить" : digits.length < 11 ? "Проверьте телефон: нужно 10 цифр после +7" : "";
+    fieldError("phone", phoneErr); if (phoneErr) bad.push(el["phone"]);
+    fieldError("agree", el["agree"].checked ? "" : "Отметьте согласие на обработку персональных данных"); if (!el["agree"].checked) bad.push(el["agree"]);
+    if (bad.length) bad[0].focus();
+    return !bad.length;
+  }
+
   form.addEventListener("submit", function (e) {
+    if (!checkFields()) {   // не отправляем, пока поля не заполнены (SendIt слушает отправку на document — до него не дойдёт)
+      e.preventDefault(); e.stopPropagation();
+      status.className = "form__status"; status.textContent = "";
+      return;
+    }
     if (form.hasAttribute("data-si-form")) {  // сайт на MODX: форму отправляет SendIt (modx/), он же проверяет поля
       // SendIt перед отправкой решает задачу защиты от ботов (до 10 с на слабом телефоне). Второе нажатие за это время
       // ушло бы второй заявкой и получило «Проверка не пройдена» — поэтому, пока идёт отправка, кнопка не работает
@@ -438,20 +501,6 @@
     e.preventDefault();
     var el = form.elements;
     var name = el["name"].value.trim(), phone = el["phone"].value.trim();
-    var bad = [];
-    el["name"].setAttribute("aria-invalid", String(!name)); if (!name) bad.push(el["name"]);
-    var phoneOk = phone.replace(/\D/g, "").length >= 10;
-    el["phone"].setAttribute("aria-invalid", String(!phoneOk)); if (!phoneOk) bad.push(el["phone"]);
-    if (bad.length) {
-      status.className = "form__status is-err";
-      status.textContent = !name ? "Укажите имя, чтобы мы знали, как к вам обращаться" : "Проверьте телефон: нужно минимум 10 цифр";
-      bad[0].focus(); return;
-    }
-    if (!el["agree"].checked) {   // согласие на обработку данных — обязательно (152-ФЗ)
-      status.className = "form__status is-err";
-      status.textContent = "Отметьте согласие на обработку персональных данных";
-      el["agree"].focus(); return;
-    }
     var data = { name: name, phone: phone, topic: el["topic"].value, message: el["message"].value.trim(), page: location.href };
     var btn = form.querySelector("button[type=submit]");
 

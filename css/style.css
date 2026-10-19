@@ -512,6 +512,7 @@ p { margin: 0; }
 .form__err { margin: 0; font-size: 13px; color: #C0392B; }
 .form__err:empty { display: none; }
 .form .si-error { border-color: #C0392B !important; }
+.agree input[aria-invalid="true"], .agree input.si-error { outline: 2px solid #C0392B; outline-offset: 2px; }
 
 /* ---------- подвал ---------- */
 .footer { background: var(--espresso); color: rgba(255,246,236,.7); text-align: center; padding: 56px var(--gutter) 40px; display: grid; justify-items: center; gap: 10px; font-size: 14px; }

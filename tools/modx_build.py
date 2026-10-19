@@ -195,7 +195,9 @@ f = CHUNKS["fc.contacts"]
 f = must_replace(f, '<form class="form" id="leadForm" novalidate>',
                  '<form class="form" id="leadForm" action="[[~[[*id]]]]" method="post" novalidate data-si-form="fastcup" data-si-preset="fastcup">\n'
                  '        <input type="hidden" name="page" value="[[*pagetitle]] ([[~[[*id]]? &scheme=`full`]])">', "форма")
-for field in ("name", "phone"):
+for field in ("name", "phone"):   # места для ошибок под полями (если их ещё нет в index.html)
+    if 'data-si-error="%s"' % field in f:
+        continue
     f = re.sub(r'(<input id="f-%s"[^>]*>)' % field, r'\1\n          <p class="form__err" data-si-error="%s" aria-live="polite"></p>' % field, f, count=1)
 if 'name="agree"' not in f:
     sys.exit("В форме нет галочки согласия name=\"agree\" — без неё SendIt не примет заявку (152-ФЗ)")
